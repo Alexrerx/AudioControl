@@ -1,12 +1,16 @@
 package com.rerx.alexey.audiocontrol;
 
 import android.app.Activity;
+import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 public class MainActivity extends Activity {
@@ -14,18 +18,29 @@ public class MainActivity extends Activity {
     final String TAG = "myLogs";
 
     ProgressBar pb;
+    LinearLayout amplitudeLayout;
+    HorizontalScrollView amplitudeScroll;
+
+    Context context;
 
     int myBufferSize = 8192;
+    int amplitudeColor;
     AudioRecord audioRecord;
     boolean isReading = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        pb = (ProgressBar) findViewById(R.id.progressBar);
+        context = this;
+        amplitudeColor = getResources().getColor(R.color.amplitude);
 
+
+        pb = (ProgressBar) findViewById(R.id.progressBar);
+        amplitudeLayout = (LinearLayout) findViewById(R.id.amplitudeLayout);
+        amplitudeScroll = (HorizontalScrollView) findViewById(R.id.amplitudeSCroll);
 
         createAudioRecorder();
 
@@ -53,17 +68,18 @@ public class MainActivity extends Activity {
         audioRecord.startRecording();
         int recordingState = audioRecord.getRecordingState();
         Log.e(TAG, "recordingState = " + recordingState);
+        readStart();
     }
 
     public void recordStop(View v) {
+        readStop();
         Log.e(TAG, "record stop ");
         audioRecord.stop();
     }
 
-
     byte[] myBuffer;
-    int i;
-    public void readStart(View v) {
+
+    public void readStart() {
 
         Log.e(TAG, "read start ");
         isReading = true;
@@ -81,28 +97,54 @@ public class MainActivity extends Activity {
                     totalCount += readCount;
 //                    Log.e(TAG, "readCount = " + readCount + ", totalCount = "
 //                            + totalCount);
-                    for (i= 0;i<50;i+=2){
-                        Log.e(TAG,Integer.toString(i)+":"+myBuffer[i]);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                pb.setProgress(toProgress(myBuffer[i]));
-                            }
-                        });
+                    for (int i = 0; i < 50; i += 2) {
+                        Log.d(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + dataToProgress(myBuffer[i]));
+                        setVisualization(myBuffer[i]);
                     }
                 }
             }
         }).start();
     }
 
-    int toProgress(byte a){
+    private void setVisualization(final byte data) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                pb.setProgress(dataToProgress(data));
+            }
+        });
+        setAmplitude(dataToAmplitude(data));
+
+    }
+
+    int dataToProgress(int a) {
         if(a<0){
             a+=256;
         }
-        return  a/10;
+        return (256 - a) / 5;
     }
 
-    public void readStop(View v) {
+    int dataToAmplitude(int a) {
+        if (a < 0) {
+            a += 256;
+        }
+        return (256 - a) * 2;
+    }
+
+    public void setAmplitude(int amplitude) {
+        final ImageView img = new ImageView(context);
+        img.setLayoutParams(new LinearLayout.LayoutParams(10, amplitude));
+        img.setBackgroundColor(amplitudeColor);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                amplitudeLayout.addView(img);
+            }
+        });
+        amplitudeScroll.scrollBy(10, 0);
+    }
+
+    public void readStop() {
         Log.e(TAG, "read stop");
         isReading = false;
     }
