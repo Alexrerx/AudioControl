@@ -7,10 +7,13 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 
 public class MainActivity extends Activity {
 
     final String TAG = "myLogs";
+
+    ProgressBar pb;
 
     int myBufferSize = 8192;
     AudioRecord audioRecord;
@@ -20,6 +23,9 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        pb = (ProgressBar) findViewById(R.id.progressBar);
+
 
         createAudioRecorder();
 
@@ -54,7 +60,11 @@ public class MainActivity extends Activity {
         audioRecord.stop();
     }
 
+
+    byte[] myBuffer;
+    int i;
     public void readStart(View v) {
+
         Log.e(TAG, "read start");
         isReading = true;
         new Thread(new Runnable() {
@@ -63,7 +73,7 @@ public class MainActivity extends Activity {
                 if (audioRecord == null)
                     return;
 
-                byte[] myBuffer = new byte[myBufferSize];
+                myBuffer = new byte[myBufferSize];
                 int readCount = 0;
                 int totalCount = 0;
                 while (isReading) {
@@ -71,12 +81,25 @@ public class MainActivity extends Activity {
                     totalCount += readCount;
 //                    Log.e(TAG, "readCount = " + readCount + ", totalCount = "
 //                            + totalCount);
-                    for (int i = 0;i<100;i++){
+                    for (i= 0;i<50;i+=2){
                         Log.e(TAG,Integer.toString(i)+":"+myBuffer[i]);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                pb.setProgress(toProgress(myBuffer[i]));
+                            }
+                        });
                     }
                 }
             }
         }).start();
+    }
+
+    int toProgress(byte a){
+        if(a<0){
+            a+=256;
+        }
+        return  a/10;
     }
 
     public void readStop(View v) {
