@@ -56,7 +56,7 @@ public class MainActivity extends Activity {
     }
 
     public void recordStop(View v) {
-        Log.e(TAG, "record stop");
+        Log.e(TAG, "record stop ");
         audioRecord.stop();
     }
 
@@ -65,7 +65,7 @@ public class MainActivity extends Activity {
     int i;
     public void readStart(View v) {
 
-        Log.e(TAG, "read start");
+        Log.e(TAG, "read start ");
         isReading = true;
         new Thread(new Runnable() {
             @Override
