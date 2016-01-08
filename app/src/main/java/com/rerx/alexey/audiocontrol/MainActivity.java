@@ -133,7 +133,7 @@ public class MainActivity extends Activity {
 
     public void setAmplitude(int amplitude) {
         final ImageView img = new ImageView(context);
-        img.setLayoutParams(new LinearLayout.LayoutParams(10, amplitude));
+        img.setLayoutParams(new LinearLayout.LayoutParams(5, amplitude));
         img.setBackgroundColor(amplitudeColor);
         runOnUiThread(new Runnable() {
             @Override
