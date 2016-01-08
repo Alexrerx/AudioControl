@@ -1,6 +1,5 @@
 package com.rerx.alexey.audiocontrol;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.media.AudioFormat;
@@ -15,7 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 public class MainActivity extends Activity {
-    FFTKuli_Turky fftKuliTurky;
+FFTKuli_Turky fftKuliTurky;
     final String TAG = "myLogs";
     Window window;
     ProgressBar pb;
@@ -24,7 +23,7 @@ public class MainActivity extends Activity {
 
     Context context;
 
-    short myBufferSize = 128;
+    short myBufferSize = 64;
     int amplitudeColor;
     AudioRecord audioRecord;
     boolean isReading = false;
@@ -46,8 +45,6 @@ public class MainActivity extends Activity {
         createAudioRecorder();
 
         Log.e(TAG, "init state = " + audioRecord.getState());
-
-        setAFC();
     }
 
     void createAudioRecorder() {
@@ -103,18 +100,20 @@ public class MainActivity extends Activity {
 //                    Log.e(TAG, "readCount = " + readCount + ", totalCount = "
 //                            + totalCount);
                     for (int i = 0; i < myBufferSize; i += 2) {
-//                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
-//                        myBuffer[i] *= window.Hamming(i, myBufferSize);
-//                        setVisualization(myBuffer[i]);
-                        updateAFC(i, myBuffer[i]);
+                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
+                        myBuffer[i] *= window.Hamming(i, myBufferSize);
+                        setVisualization(myBuffer[i]);
                     }
-//                    for (int k = 0;k < myBufferSize;k++){
-//                            fftKuliTurky.Calculate(myBuffer);
-//                            Log.i(TAG,Integer.toString() );
-//                        }
+
                 }
             }
         }).start();
+        for (int k = 0;k < myBufferSize;k++){
+            fftKuliTurky.Calculate(myBuffer);
+            Log.i(TAG,Integer.toString() );
+        }
+
+
     }
 
     private void setVisualization(final short data) {
@@ -124,7 +123,7 @@ public class MainActivity extends Activity {
                 pb.setProgress((data));
             }
         });
-//        setAmplitude((data));
+        setAmplitude((data));
 
     }
 
@@ -144,7 +143,7 @@ public class MainActivity extends Activity {
 
     public void setAmplitude(int amplitude) {
         final ImageView img = new ImageView(context);
-        img.setLayoutParams(new LinearLayout.LayoutParams(4, amplitude));
+        img.setLayoutParams(new LinearLayout.LayoutParams(5, amplitude));
         img.setBackgroundColor(amplitudeColor);
         runOnUiThread(new Runnable() {
             @Override
@@ -152,23 +151,7 @@ public class MainActivity extends Activity {
                 amplitudeLayout.addView(img);
             }
         });
-//        amplitudeScroll.scrollBy(10, 0);
-    }
-
-    void setAFC() {
-        for (int i = 0; i < myBufferSize; i++) {
-            setAmplitude(2);
-        }
-    }
-
-    void updateAFC(final int index, final short amplitude) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                amplitudeLayout.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(2, amplitude));
-            }
-        });
-
+        amplitudeScroll.scrollBy(10, 0);
     }
 
     public void readStop() {
