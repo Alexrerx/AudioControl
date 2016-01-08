@@ -108,6 +108,7 @@ public class MainActivity extends Activity {
 //                        setVisualization(myBuffer[i]);
                         updateAFC(i, myBuffer[i]);
                     }
+
 //                    for (int k = 0;k < myBufferSize;k++){
 //                            fftKuliTurky.Calculate(myBuffer);
 //                            Log.i(TAG,Integer.toString() );
