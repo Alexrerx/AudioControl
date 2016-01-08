@@ -142,4 +142,9 @@ public class Complex {
 
         return cos().divides(sin());
     }
+    public Complex PoweredE()
+    {
+        double e = Math.exp(re);
+        return new Complex(e * Math.cos(im), e * Math.sin(im));
+    }
 }

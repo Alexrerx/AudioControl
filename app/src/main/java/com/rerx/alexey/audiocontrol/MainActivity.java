@@ -23,7 +23,7 @@ public class MainActivity extends Activity {
 
     Context context;
 
-    int myBufferSize = 512;
+    int myBufferSize = 64;
     int amplitudeColor;
     AudioRecord audioRecord;
     boolean isReading = false;
@@ -99,8 +99,8 @@ public class MainActivity extends Activity {
 //                    Log.e(TAG, "readCount = " + readCount + ", totalCount = "
 //                            + totalCount);
                     for (int i = 0; i < myBufferSize; i += 2) {
-                        Log.d(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + dataToProgress(myBuffer[i]));
-                        myBuffer[i] *= window.Gausse(i,myBufferSize);
+                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + dataToProgress(myBuffer[i]));
+                        myBuffer[i] *= window.Hamming(i,myBufferSize);
                         setVisualization(myBuffer[i]);
                     }
                 }
