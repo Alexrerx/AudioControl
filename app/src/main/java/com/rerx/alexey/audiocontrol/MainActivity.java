@@ -1,13 +1,17 @@
 package com.rerx.alexey.audiocontrol;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -21,14 +25,14 @@ public class MainActivity extends Activity {
     Window window;
     ProgressBar pb;
     LinearLayout amplitudeLayoutTOP, amplitudeLayoutBOTTOM;
-    HorizontalScrollView amplitudeScrollTOP;
+    HorizontalScrollView amplitudeScrollTOP, amplitudeScrollBOTTOM;
 
     Context context;
 
     short myBufferSize = 256;
     int amplitudeColor;
-    int barSize = 2;
-    float sensivityRatio = (float) 0.05;
+    int barSize = 4;
+    float sensivityRatio = (float) 0.02;
     AudioRecord audioRecord;
     boolean isReading = false;
 
@@ -47,7 +51,7 @@ public class MainActivity extends Activity {
         amplitudeLayoutBOTTOM = (LinearLayout) findViewById(R.id.amplitudeLayoutBOTTOM);
 
         amplitudeScrollTOP = (HorizontalScrollView) findViewById(R.id.amplitudeSCrollTOP);
-
+        amplitudeScrollBOTTOM = (HorizontalScrollView) findViewById(R.id.amplitudeSCrollBOTTOM);
         createAudioRecorder();
 
         Log.e(TAG, "init state = " + audioRecord.getState());
@@ -107,14 +111,17 @@ public class MainActivity extends Activity {
                     totalCount += readCount;
 //                    Log.e(TAG, "readCount = " + readCount + ", totalCount = "
 //                            + totalCount);
-                    for (int i = 0; i < myBufferSize; i += 2) {
-//                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
-//                        myBuffer[i] *= window.Hamming(i, myBufferSize);
-//                        setVisualization(myBuffer[i]);
-                        updateAFC(i, (short) (myBuffer[i] * sensivityRatio));
+                    for (int i = 0; i < myBuffer.length; i++) {
+                        myBuffer[i] *= (sensivityRatio * window.Gausse(i, myBufferSize));
                     }
                    Complex[] spectrumComplex = fftAnother.DecimationInTime(complex.realToComplex(myBuffer),true);
                    short[] spectrum = complex.complexToShort(spectrumComplex);
+                    for (int i = 0; i < myBufferSize / 2; i++) {
+//                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
+//                        myBuffer[i] *= window.Hamming(i, myBufferSize);
+//                        setVisualization(myBuffer[i]);
+                        updateAFC(i, (short) spectrum[i]);
+                    }
 
 
 
@@ -140,23 +147,8 @@ public class MainActivity extends Activity {
                 pb.setProgress((data));
             }
         });
-//        setAmplitude((data));
 
     }
-
-//    int dataToProgress(int a) {
-//        if(a<0){
-//            a+=256;
-//        }
-//        return (256 - a) / 5;
-//    }
-//
-//    int dataToAmplitude(int a) {
-//        if (a < 0) {
-//            a += 256;
-//        }
-//        return (256 - a) * 2;
-//    }
 
     public void setAmplitude(int amplitude, final LinearLayout layout) {
         final ImageView img = new ImageView(context);
@@ -172,7 +164,7 @@ public class MainActivity extends Activity {
     }
 
     void setAFC() {
-        for (int i = 0; i < myBufferSize; i++) {
+        for (int i = 0; i < myBufferSize / 2; i++) {
             setAmplitude(2, amplitudeLayoutTOP);
             setAmplitude(2, amplitudeLayoutBOTTOM);
         }
@@ -186,12 +178,22 @@ public class MainActivity extends Activity {
                     amplitudeLayoutTOP.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, amplitude));
                     amplitudeLayoutBOTTOM.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, 0));
                 } else {
-                    amplitudeLayoutTOP.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, 0));
-                    amplitudeLayoutBOTTOM.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, -amplitude));
+//                    amplitudeLayoutTOP.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, 0));
+//                    amplitudeLayoutBOTTOM.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, -amplitude));
                 }
             }
         });
 
+    }
+
+    void updateAFC_2(final int index, final short amplitude) {
+        if (amplitude > 0) {
+            setAmplitude(amplitude, amplitudeLayoutTOP);
+            setAmplitude(0, amplitudeLayoutBOTTOM);
+        } else {
+            setAmplitude(0, amplitudeLayoutTOP);
+            setAmplitude(-amplitude, amplitudeLayoutBOTTOM);
+        }
     }
 
     public void readStop() {

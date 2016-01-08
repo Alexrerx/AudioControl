@@ -11,7 +11,7 @@ public class FFTAnother {
         public final double SinglePi = Math.PI;
         public static final double DoublePi = 2*Math.PI;
 
-        public static Complex[] DecimationInTime(Complex[] frame, boolean direct)
+    public Complex[] DecimationInTime(Complex[] frame, boolean direct)
         {
             if (frame.length == 1) return frame;
             int frameHalfSize = frame.length >> 1; // frame.Length/2
