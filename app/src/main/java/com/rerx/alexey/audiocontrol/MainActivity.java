@@ -16,7 +16,7 @@ import android.widget.ProgressBar;
 public class MainActivity extends Activity {
 
     final String TAG = "myLogs";
-
+    Window window;
     ProgressBar pb;
     LinearLayout amplitudeLayout;
     HorizontalScrollView amplitudeScroll;
@@ -90,6 +90,7 @@ public class MainActivity extends Activity {
                     return;
 
                 myBuffer = new byte[myBufferSize];
+                window = new Window();
                 int readCount = 0;
                 int totalCount = 0;
                 while (isReading) {
@@ -99,6 +100,7 @@ public class MainActivity extends Activity {
 //                            + totalCount);
                     for (int i = 0; i < myBufferSize; i += 2) {
                         Log.d(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + dataToProgress(myBuffer[i]));
+                        myBuffer[i] *= window.Gausse(i,myBufferSize);
                         setVisualization(myBuffer[i]);
                     }
                 }
