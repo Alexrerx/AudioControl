@@ -1,6 +1,5 @@
 package com.rerx.alexey.audiocontrol;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.media.AudioFormat;
@@ -21,13 +20,15 @@ public class MainActivity extends Activity {
     final String TAG = "myLogs";
     Window window;
     ProgressBar pb;
-    LinearLayout amplitudeLayout;
-    HorizontalScrollView amplitudeScroll;
+    LinearLayout amplitudeLayoutTOP, amplitudeLayoutBOTTOM;
+    HorizontalScrollView amplitudeScrollTOP;
 
     Context context;
 
-    short myBufferSize = 128;
+    short myBufferSize = 256;
     int amplitudeColor;
+    int barSize = 2;
+    float sensivityRatio = (float) 0.05;
     AudioRecord audioRecord;
     boolean isReading = false;
 
@@ -42,8 +43,10 @@ public class MainActivity extends Activity {
 
 
         pb = (ProgressBar) findViewById(R.id.progressBar);
-        amplitudeLayout = (LinearLayout) findViewById(R.id.amplitudeLayout);
-        amplitudeScroll = (HorizontalScrollView) findViewById(R.id.amplitudeSCroll);
+        amplitudeLayoutTOP = (LinearLayout) findViewById(R.id.amplitudeLayoutTOP);
+        amplitudeLayoutBOTTOM = (LinearLayout) findViewById(R.id.amplitudeLayoutBOTTOM);
+
+        amplitudeScrollTOP = (HorizontalScrollView) findViewById(R.id.amplitudeSCrollTOP);
 
         createAudioRecorder();
 
@@ -108,8 +111,7 @@ public class MainActivity extends Activity {
 //                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
 //                        myBuffer[i] *= window.Hamming(i, myBufferSize);
 //                        setVisualization(myBuffer[i]);
-                        updateAFC(i,myBuffer[i]);
-
+                        updateAFC(i, (short) (myBuffer[i] * sensivityRatio));
                     }
                     fftAnother.DecimationInTime(complex.realToComplex(myBuffer),true);
 
@@ -155,22 +157,23 @@ public class MainActivity extends Activity {
 //        return (256 - a) * 2;
 //    }
 
-    public void setAmplitude(int amplitude) {
+    public void setAmplitude(int amplitude, final LinearLayout layout) {
         final ImageView img = new ImageView(context);
-        img.setLayoutParams(new LinearLayout.LayoutParams(4, amplitude));
+        img.setLayoutParams(new LinearLayout.LayoutParams(barSize, amplitude));
         img.setBackgroundColor(amplitudeColor);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                amplitudeLayout.addView(img);
+                layout.addView(img);
             }
         });
-//        amplitudeScroll.scrollBy(10, 0);
+//        amplitudeScrollTOP.scrollBy(10, 0);
     }
 
     void setAFC() {
         for (int i = 0; i < myBufferSize; i++) {
-            setAmplitude(2);
+            setAmplitude(2, amplitudeLayoutTOP);
+            setAmplitude(2, amplitudeLayoutBOTTOM);
         }
     }
 
@@ -178,7 +181,13 @@ public class MainActivity extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                amplitudeLayout.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(2, amplitude));
+                if (amplitude > 0) {
+                    amplitudeLayoutTOP.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, amplitude));
+                    amplitudeLayoutBOTTOM.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, 0));
+                } else {
+                    amplitudeLayoutTOP.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, 0));
+                    amplitudeLayoutBOTTOM.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, -amplitude));
+                }
             }
         });
 
