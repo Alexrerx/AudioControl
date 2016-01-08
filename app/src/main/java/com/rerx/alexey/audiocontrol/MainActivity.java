@@ -15,6 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 public class MainActivity extends Activity {
+    FFTAnother fftAnother;
+    Complex complex;
     FFTKuli_Turky fftKuliTurky;
     final String TAG = "myLogs";
     Window window;
@@ -46,6 +48,7 @@ public class MainActivity extends Activity {
         createAudioRecorder();
 
         Log.e(TAG, "init state = " + audioRecord.getState());
+        setAFC();
     }
 
     void createAudioRecorder() {
@@ -82,7 +85,8 @@ public class MainActivity extends Activity {
 
     public void readStart() {
         fftKuliTurky = new FFTKuli_Turky();
-
+        complex = new Complex();
+        fftAnother = new FFTAnother();
         Log.e(TAG, "read start ");
         isReading = true;
         new Thread(new Runnable() {
@@ -101,10 +105,14 @@ public class MainActivity extends Activity {
 //                    Log.e(TAG, "readCount = " + readCount + ", totalCount = "
 //                            + totalCount);
                     for (int i = 0; i < myBufferSize; i += 2) {
-                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
-                        myBuffer[i] *= window.Hamming(i, myBufferSize);
-                        setVisualization(myBuffer[i]);
+//                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
+//                        myBuffer[i] *= window.Hamming(i, myBufferSize);
+//                        setVisualization(myBuffer[i]);
+                        updateAFC(i,myBuffer[i]);
+
                     }
+                    fftAnother.DecimationInTime(complex.realToComplex(myBuffer),true);
+
 
 
 //                    for (int k = 0;k < myBufferSize;k++){
@@ -114,10 +122,10 @@ public class MainActivity extends Activity {
                 }
             }
         }).start();
-        for (int k = 0;k < myBufferSize;k++){
-            fftKuliTurky.Calculate(myBuffer);
-            Log.i(TAG,Integer.toString() );
-        }
+//        for (int k = 0;k < myBufferSize;k++){
+//            fftKuliTurky.Calculate(myBuffer);
+//            Log.i(TAG,Integer.toString() );
+//        }
 
 
     }

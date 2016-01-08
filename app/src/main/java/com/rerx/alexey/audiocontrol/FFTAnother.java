@@ -7,8 +7,7 @@ public class FFTAnother {
 
     //magnitude = Math.Sqrt(x.Real*x.Real + x.Imaginary*x.Imaginary)
     //phase = Math.Atan2(x.Imaginary, x.Real)
-    public static class Butterfly
-    {
+
         public final double SinglePi = Math.PI;
         public static final double DoublePi = 2*Math.PI;
 
@@ -83,4 +82,3 @@ public class FFTAnother {
             return spectrum;
         }
     }
-}

@@ -34,13 +34,16 @@ public class Complex {
      ******************************************************************************/
 
 
-    private final double re;   // the real part
-    private final double im;   // the imaginary part
+    private double re;   // the real part
+    private double im;   // the imaginary part
 
     // create a new object with the given real and imaginary parts
     public Complex(double real, double imag) {
         re = real;
         im = imag;
+    }
+    public Complex(){
+
     }
 
     // return a string representation of the invoking Complex object
@@ -146,5 +149,12 @@ public class Complex {
     {
         double e = Math.exp(re);
         return new Complex(e * Math.cos(im), e * Math.sin(im));
+    }
+    public Complex[] realToComplex(short arr[]){
+        Complex[] complex = new Complex[arr.length];
+        for (int i = 0;i<arr.length;i++){
+            complex[i] = new Complex(arr[i],0);
+        }
+        return complex;
     }
 }
