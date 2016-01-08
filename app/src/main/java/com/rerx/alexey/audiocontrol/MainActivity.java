@@ -31,7 +31,7 @@ public class MainActivity extends Activity {
 
     short myBufferSize = 256;
     int amplitudeColor;
-    int barSize = 4;
+    int barSize = 8;
     float sensivityRatio = (float) 0.02;
     AudioRecord audioRecord;
     boolean isReading = false;
@@ -116,7 +116,7 @@ public class MainActivity extends Activity {
                     }
                    Complex[] spectrumComplex = fftAnother.DecimationInTime(complex.realToComplex(myBuffer),true);
                    short[] spectrum = complex.complexToShort(spectrumComplex);
-                    for (int i = 0; i < myBufferSize / 2; i++) {
+                    for (int i = 0; i < myBufferSize / 8; i++) {
 //                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
                         myBuffer[i] *= window.Gausse(i, myBufferSize);
 //                        setVisualization(myBuffer[i]);
