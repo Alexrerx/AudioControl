@@ -28,7 +28,7 @@ public class MainActivity extends Activity {
     short myBufferSize = 256;
     int amplitudeColor;
     int barSize = 2;
-    float sensivityRatio = (float) 0.05;
+    float sensivityRatio = (float) 0.02;
     AudioRecord audioRecord;
     boolean isReading = false;
 
@@ -107,17 +107,15 @@ public class MainActivity extends Activity {
                     totalCount += readCount;
 //                    Log.e(TAG, "readCount = " + readCount + ", totalCount = "
 //                            + totalCount);
-                    for (int i = 0; i < myBufferSize; i += 2) {
-//                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
-//                        myBuffer[i] *= window.Hamming(i, myBufferSize);
-//                        setVisualization(myBuffer[i]);
-                        updateAFC(i, (short) (myBuffer[i] * sensivityRatio));
-                    }
+
                    Complex[] spectrumComplex = fftAnother.DecimationInTime(complex.realToComplex(myBuffer),true);
                    short[] spectrum = complex.complexToShort(spectrumComplex);
-
-
-
+                    for (int i = 0; i < myBufferSize; i += 2) {
+//                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
+                        myBuffer[i] *= window.Gausse(i, myBufferSize);
+//                        setVisualization(myBuffer[i]);
+                        updateAFC(i, (short) (spectrum[i] * sensivityRatio));
+                    }
 //                    for (int k = 0;k < myBufferSize;k++){
 //                            fftKuliTurky.Calculate(myBuffer);
 //                            Log.i(TAG,Integer.toString() );
