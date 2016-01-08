@@ -113,7 +113,8 @@ public class MainActivity extends Activity {
 //                        setVisualization(myBuffer[i]);
                         updateAFC(i, (short) (myBuffer[i] * sensivityRatio));
                     }
-                    fftAnother.DecimationInTime(complex.realToComplex(myBuffer),true);
+                   Complex[] spectrumComplex = fftAnother.DecimationInTime(complex.realToComplex(myBuffer),true);
+                   short[] spectrum = complex.complexToShort(spectrumComplex);
 
 
 
