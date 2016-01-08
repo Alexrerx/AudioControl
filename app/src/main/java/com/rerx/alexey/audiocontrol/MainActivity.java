@@ -100,7 +100,7 @@ FFTKuli_Turky fftKuliTurky;
 //                    Log.e(TAG, "readCount = " + readCount + ", totalCount = "
 //                            + totalCount);
                     for (int i = 0; i < myBufferSize; i += 2) {
-                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + dataToProgress(myBuffer[i]));
+                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
                         myBuffer[i] *= window.Hamming(i, myBufferSize);
                         setVisualization(myBuffer[i]);
                     }
@@ -120,10 +120,10 @@ FFTKuli_Turky fftKuliTurky;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                pb.setProgress(dataToProgress(data));
+                pb.setProgress((data));
             }
         });
-        setAmplitude(dataToAmplitude(data));
+        setAmplitude((data));
 
     }
 
