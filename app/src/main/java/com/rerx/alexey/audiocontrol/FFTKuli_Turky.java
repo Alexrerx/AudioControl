@@ -4,7 +4,7 @@ package com.rerx.alexey.audiocontrol;
  * Created by alexey on 08.01.16.
  */
 public class FFTKuli_Turky {
-    ComplexKuli complexKuli;
+    //ComplexKuli complexKuli;
 
     /// <summary>
     /// Calculates FFT using Cooley-Tukey FFT algorithm.
@@ -15,7 +15,7 @@ public class FFTKuli_Turky {
     /// If amount of data items not equal a power of 2, then algorithm
     /// automatically pad with 0s to the lowest amount of power of 2.
     /// </remarks>
-    public static double[] Calculate(double[] x)
+    public static double[] Calculate(byte[] x)//было double
     {
         int length;
         int bitsInLength;

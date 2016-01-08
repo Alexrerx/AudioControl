@@ -14,7 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 public class MainActivity extends Activity {
-
+FFTKuli_Turky fftKuliTurky;
     final String TAG = "myLogs";
     Window window;
     ProgressBar pb;
@@ -80,6 +80,7 @@ public class MainActivity extends Activity {
     byte[] myBuffer;
 
     public void readStart() {
+        fftKuliTurky = new FFTKuli_Turky();
 
         Log.e(TAG, "read start ");
         isReading = true;
@@ -100,12 +101,19 @@ public class MainActivity extends Activity {
 //                            + totalCount);
                     for (int i = 0; i < myBufferSize; i += 2) {
                         Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + dataToProgress(myBuffer[i]));
-                        myBuffer[i] *= window.Hamming(i,myBufferSize);
+                        myBuffer[i] *= window.Hamming(i, myBufferSize);
                         setVisualization(myBuffer[i]);
                     }
+
                 }
             }
         }).start();
+        for (int k = 0;k < myBufferSize;k++){
+            fftKuliTurky.Calculate(myBuffer);
+            Log.i(TAG,Integer.toString() )
+        }
+
+
     }
 
     private void setVisualization(final byte data) {
