@@ -1,5 +1,6 @@
 package com.rerx.alexey.audiocontrol;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.media.AudioFormat;
@@ -14,7 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 public class MainActivity extends Activity {
-FFTKuli_Turky fftKuliTurky;
+    FFTKuli_Turky fftKuliTurky;
     final String TAG = "myLogs";
     Window window;
     ProgressBar pb;
@@ -23,7 +24,7 @@ FFTKuli_Turky fftKuliTurky;
 
     Context context;
 
-    short myBufferSize = 64;
+    short myBufferSize = 128;
     int amplitudeColor;
     AudioRecord audioRecord;
     boolean isReading = false;
@@ -105,6 +106,11 @@ FFTKuli_Turky fftKuliTurky;
                         setVisualization(myBuffer[i]);
                     }
 
+
+//                    for (int k = 0;k < myBufferSize;k++){
+//                            fftKuliTurky.Calculate(myBuffer);
+//                            Log.i(TAG,Integer.toString() );
+//                        }
                 }
             }
         }).start();
@@ -123,7 +129,7 @@ FFTKuli_Turky fftKuliTurky;
                 pb.setProgress((data));
             }
         });
-        setAmplitude((data));
+//        setAmplitude((data));
 
     }
 
@@ -143,7 +149,7 @@ FFTKuli_Turky fftKuliTurky;
 
     public void setAmplitude(int amplitude) {
         final ImageView img = new ImageView(context);
-        img.setLayoutParams(new LinearLayout.LayoutParams(5, amplitude));
+        img.setLayoutParams(new LinearLayout.LayoutParams(4, amplitude));
         img.setBackgroundColor(amplitudeColor);
         runOnUiThread(new Runnable() {
             @Override
@@ -151,7 +157,23 @@ FFTKuli_Turky fftKuliTurky;
                 amplitudeLayout.addView(img);
             }
         });
-        amplitudeScroll.scrollBy(10, 0);
+//        amplitudeScroll.scrollBy(10, 0);
+    }
+
+    void setAFC() {
+        for (int i = 0; i < myBufferSize; i++) {
+            setAmplitude(2);
+        }
+    }
+
+    void updateAFC(final int index, final short amplitude) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                amplitudeLayout.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(2, amplitude));
+            }
+        });
+
     }
 
     public void readStop() {
