@@ -1,5 +1,7 @@
 package com.rerx.alexey.audiocontrol;
 
+import android.content.Context;
+
 /**
  * Created by alexey on 08.01.16.
  */
@@ -156,5 +158,14 @@ public class Complex {
             complex[i] = new Complex(arr[i],0);
         }
         return complex;
+    }
+
+    public short[] complexToShort(Complex[]arr){
+        short[] mas = new short[arr.length];
+        for (int i = 0;i<arr.length;i++){
+            short a = (short)arr[i].re;
+            mas[i] = a;
+        }
+        return mas;
     }
 }
