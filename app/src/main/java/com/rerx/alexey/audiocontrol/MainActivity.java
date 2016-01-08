@@ -118,7 +118,7 @@ public class MainActivity extends Activity {
                    short[] spectrum = complex.complexToShort(spectrumComplex);
                     for (int i = 0; i < myBufferSize / 2; i++) {
 //                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
-//                        myBuffer[i] *= window.Hamming(i, myBufferSize);
+                        myBuffer[i] *= window.Gausse(i, myBufferSize);
 //                        setVisualization(myBuffer[i]);
                         updateAFC(i, (short) spectrum[i]);
                     }
