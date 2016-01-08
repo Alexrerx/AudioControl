@@ -98,7 +98,6 @@ public class FFTKuli_Turky {
         {
             int nextBit = n & 1;
             n >>= 1;
-
             reversed <<= 1;
             reversed |= nextBit;
         }
