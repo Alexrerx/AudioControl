@@ -24,8 +24,8 @@ public class MainActivity extends Activity {
     final String TAG = "myLogs";
     Window window;
     ProgressBar pb;
-    LinearLayout amplitudeLayoutTOP, amplitudeLayoutBOTTOM;
-    HorizontalScrollView amplitudeScrollTOP, amplitudeScrollBOTTOM;
+    LinearLayout amplitudeLayoutTOP;
+    HorizontalScrollView amplitudeScrollTOP;
 
     Context context;
 
@@ -48,10 +48,6 @@ public class MainActivity extends Activity {
 
         pb = (ProgressBar) findViewById(R.id.progressBar);
         amplitudeLayoutTOP = (LinearLayout) findViewById(R.id.amplitudeLayoutTOP);
-        amplitudeLayoutBOTTOM = (LinearLayout) findViewById(R.id.amplitudeLayoutBOTTOM);
-
-        amplitudeScrollTOP = (HorizontalScrollView) findViewById(R.id.amplitudeSCrollTOP);
-        amplitudeScrollBOTTOM = (HorizontalScrollView) findViewById(R.id.amplitudeSCrollBOTTOM);
         createAudioRecorder();
 
         Log.e(TAG, "init state = " + audioRecord.getState());
@@ -116,11 +112,11 @@ public class MainActivity extends Activity {
                     }
                    Complex[] spectrumComplex = fftAnother.DecimationInTime(complex.realToComplex(myBuffer),true);
                    short[] spectrum = complex.complexToShort(spectrumComplex);
-                    for (int i = 0; i < myBufferSize / 8; i++) {
+                    for (int i = 0; i < myBufferSize / 2; i++) {
 //                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
                         myBuffer[i] *= window.Gausse(i, myBufferSize);
 //                        setVisualization(myBuffer[i]);
-                        updateAFC(i, (short) spectrum[i]);
+                        updateAFC(i, (short) (spectrum[i] * 0.5));
                     }
 
 
@@ -166,7 +162,6 @@ public class MainActivity extends Activity {
     void setAFC() {
         for (int i = 0; i < myBufferSize / 2; i++) {
             setAmplitude(2, amplitudeLayoutTOP);
-            setAmplitude(2, amplitudeLayoutBOTTOM);
         }
     }
 
@@ -176,25 +171,12 @@ public class MainActivity extends Activity {
             public void run() {
                 if (amplitude > 0) {
                     amplitudeLayoutTOP.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, amplitude));
-                    amplitudeLayoutBOTTOM.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, 0));
-                } else {
-//                    amplitudeLayoutTOP.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, 0));
-//                    amplitudeLayoutBOTTOM.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, -amplitude));
                 }
             }
         });
 
     }
 
-    void updateAFC_2(final int index, final short amplitude) {
-        if (amplitude > 0) {
-            setAmplitude(amplitude, amplitudeLayoutTOP);
-            setAmplitude(0, amplitudeLayoutBOTTOM);
-        } else {
-            setAmplitude(0, amplitudeLayoutTOP);
-            setAmplitude(-amplitude, amplitudeLayoutBOTTOM);
-        }
-    }
 
     public void readStop() {
         Log.e(TAG, "read stop");
