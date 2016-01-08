@@ -15,7 +15,7 @@ public class FFTKuli_Turky {
     /// If amount of data items not equal a power of 2, then algorithm
     /// automatically pad with 0s to the lowest amount of power of 2.
     /// </remarks>
-    public static double[] Calculate(byte[] x)//было double
+    public static double[] Calculate(short[] x)//было double
     {
         int length;
         int bitsInLength;

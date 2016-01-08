@@ -23,7 +23,7 @@ FFTKuli_Turky fftKuliTurky;
 
     Context context;
 
-    int myBufferSize = 64;
+    short myBufferSize = 64;
     int amplitudeColor;
     AudioRecord audioRecord;
     boolean isReading = false;
@@ -77,7 +77,7 @@ FFTKuli_Turky fftKuliTurky;
         audioRecord.stop();
     }
 
-    byte[] myBuffer;
+    short[] myBuffer;
 
     public void readStart() {
         fftKuliTurky = new FFTKuli_Turky();
@@ -90,7 +90,7 @@ FFTKuli_Turky fftKuliTurky;
                 if (audioRecord == null)
                     return;
 
-                myBuffer = new byte[myBufferSize];
+                myBuffer = new short[myBufferSize];
                 window = new Window();
                 int readCount = 0;
                 int totalCount = 0;
@@ -110,13 +110,13 @@ FFTKuli_Turky fftKuliTurky;
         }).start();
         for (int k = 0;k < myBufferSize;k++){
             fftKuliTurky.Calculate(myBuffer);
-            Log.i(TAG,Integer.toString() )
+            Log.i(TAG,Integer.toString() );
         }
 
 
     }
 
-    private void setVisualization(final byte data) {
+    private void setVisualization(final short data) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -127,19 +127,19 @@ FFTKuli_Turky fftKuliTurky;
 
     }
 
-    int dataToProgress(int a) {
-        if(a<0){
-            a+=256;
-        }
-        return (256 - a) / 5;
-    }
-
-    int dataToAmplitude(int a) {
-        if (a < 0) {
-            a += 256;
-        }
-        return (256 - a) * 2;
-    }
+//    int dataToProgress(int a) {
+//        if(a<0){
+//            a+=256;
+//        }
+//        return (256 - a) / 5;
+//    }
+//
+//    int dataToAmplitude(int a) {
+//        if (a < 0) {
+//            a += 256;
+//        }
+//        return (256 - a) * 2;
+//    }
 
     public void setAmplitude(int amplitude) {
         final ImageView img = new ImageView(context);
