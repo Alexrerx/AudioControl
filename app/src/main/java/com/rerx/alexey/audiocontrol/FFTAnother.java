@@ -4,6 +4,9 @@ package com.rerx.alexey.audiocontrol;
  * Created by alexey on 08.01.16.
  */
 public class FFTAnother {
+
+    //magnitude = Math.Sqrt(x.Real*x.Real + x.Imaginary*x.Imaginary)
+    //phase = Math.Atan2(x.Imaginary, x.Real)
     public static class Butterfly
     {
         public final double SinglePi = Math.PI;
