@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
     short myBufferSize = 256;
     int amplitudeColor;
     int barSize = 8;
-    float sensivityRatio = (float) 0.1;
+    float sensivityRatio = (float) 0.01;
     AudioRecord audioRecord;
     boolean isReading = false;
 
@@ -119,7 +119,7 @@ public double basisDb = 0.0000000000001;
 //                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
                         //spectrum[i] *= window.Hamming(i, myBufferSize/2);
 //                        setVisualization(myBuffer[i]);
-                        updateAFC(i, (short) (spectrum[i] * 0.5));
+                        updateAFC(i, (short) ((spectrum[i]) * 0.5));
                     }
 
 
@@ -191,10 +191,10 @@ public double basisDb = 0.0000000000001;
     }
     public short[] magnitudeTransform(short spectrum[]){
         for (int i = 0;i<spectrum.length;i++){
+            spectrum[i] *= window.Gausse(i,myBufferSize);
+            //spectrum[i] /= spectrum.length;
+            //spectrum[i] = (short)(10*Math.log10(spectrum[i]/basisDb));
 
-           // spectrum[i] /= spectrum.length;
-            spectrum[i] = (short)(10*Math.log10(spectrum[i]/basisDb));
-            spectrum[i] *= window.Hamming(i,myBufferSize);
         }
         return spectrum;
     }
