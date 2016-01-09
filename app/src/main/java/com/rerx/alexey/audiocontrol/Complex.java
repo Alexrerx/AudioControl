@@ -164,7 +164,8 @@ public class Complex {
         short[] mas = new short[arr.length];
         for (int i = 0;i<arr.length;i++){
             short a = (short)arr[i].re;
-            mas[i] =  (short)Math.sqrt(arr[i].re*arr[i].re + arr[i].im*arr[i].im);
+//            mas[i] =  (short)Math.sqrt(arr[i].re*arr[i].re + arr[i].im*arr[i].im);
+            mas[i] = a;
         }
         return mas;
     }

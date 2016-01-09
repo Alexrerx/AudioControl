@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="amplitude">#3351e9</color>
+    <color name="maxAmplitude">#e93333</color>
 </resources>
