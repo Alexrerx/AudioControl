@@ -35,7 +35,7 @@ public class MainActivity extends Activity {
     boolean isReading = false;
 
     public final int frequenceA = 440;
-
+public int basisDb = 10;
 
 
 
@@ -114,9 +114,10 @@ public class MainActivity extends Activity {
                     }
                    Complex[] spectrumComplex = fftAnother.DecimationInTime(complex.realToComplex(myBuffer),true);
                    short[] spectrum = complex.complexToShort(spectrumComplex);
+                    magnitudeTransform(spectrum);
                     for (int i = 0; i < myBufferSize / 2; i++) {
 //                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
-                        spectrum[i] *= window.Hamming(i, myBufferSize/2);
+                        //spectrum[i] *= window.Hamming(i, myBufferSize/2);
 //                        setVisualization(myBuffer[i]);
                         updateAFC(i, (short) (spectrum[i] * 0.5));
                     }
@@ -187,6 +188,13 @@ public class MainActivity extends Activity {
     public void readStop() {
         Log.e(TAG, "read stop");
         isReading = false;
+    }
+    public short[] magnitudeTransform(short spectrum[]){
+        for (int i = 0;i<spectrum.length;i++){
+            spectrum[i] *= window.Hamming(i,myBufferSize);
+            spectrum[i] = (short)(10*Math.log10(spectrum[i]/basisDb));
+        }
+        return spectrum;
     }
 
     @Override
