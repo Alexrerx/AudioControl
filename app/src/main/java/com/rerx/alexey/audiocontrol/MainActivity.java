@@ -117,7 +117,6 @@ public class MainActivity extends Activity {
                     for (int i = 0; i < myBufferSize / 2; i++) {
 //                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
                         spectrum[i] *= window.Hamming(i, myBufferSize/2);
-
 //                        setVisualization(myBuffer[i]);
                         updateAFC(i, (short) (spectrum[i] * 0.5));
                     }
