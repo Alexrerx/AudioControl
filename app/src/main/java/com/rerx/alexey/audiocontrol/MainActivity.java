@@ -30,12 +30,12 @@ public class MainActivity extends Activity {
     short myBufferSize = 256;
     int amplitudeColor;
     int barSize = 8;
-    float sensivityRatio = (float) 0.01;
+    float sensivityRatio = (float) 0.1;
     AudioRecord audioRecord;
     boolean isReading = false;
 
     public final int frequenceA = 440;
-public int basisDb = 10;
+public double basisDb = 0.0000000000001;
 
 
 
@@ -191,8 +191,10 @@ public int basisDb = 10;
     }
     public short[] magnitudeTransform(short spectrum[]){
         for (int i = 0;i<spectrum.length;i++){
-            spectrum[i] *= window.Hamming(i,myBufferSize);
+
+           // spectrum[i] /= spectrum.length;
             spectrum[i] = (short)(10*Math.log10(spectrum[i]/basisDb));
+            spectrum[i] *= window.Hamming(i,myBufferSize);
         }
         return spectrum;
     }
