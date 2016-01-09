@@ -26,15 +26,17 @@ public class MainActivity extends Activity {
     ProgressBar pb;
     LinearLayout amplitudeLayoutTOP;
     HorizontalScrollView amplitudeScrollTOP;
-
     Context context;
-
     short myBufferSize = 256;
     int amplitudeColor;
     int barSize = 8;
-    float sensivityRatio = (float) 0.02;
+    float sensivityRatio = (float) 0.01;
     AudioRecord audioRecord;
     boolean isReading = false;
+
+    public final int frequenceA = 440;
+
+
 
 
     @Override
@@ -87,7 +89,7 @@ public class MainActivity extends Activity {
     short[] myBuffer;
 
     public void readStart() {
-        fftKuliTurky = new FFTKuli_Turky();
+        //fftKuliTurky = new FFTKuli_Turky();
         complex = new Complex();
         fftAnother = new FFTAnother();
         Log.e(TAG, "read start ");
@@ -114,7 +116,8 @@ public class MainActivity extends Activity {
                    short[] spectrum = complex.complexToShort(spectrumComplex);
                     for (int i = 0; i < myBufferSize / 2; i++) {
 //                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
-                        myBuffer[i] *= window.Gausse(i, myBufferSize);
+                        spectrum[i] *= window.Hamming(i, myBufferSize/2);
+
 //                        setVisualization(myBuffer[i]);
                         updateAFC(i, (short) (spectrum[i] * 0.5));
                     }
@@ -175,6 +178,10 @@ public class MainActivity extends Activity {
             }
         });
 
+    }
+    public int frequeceFromA(int noteNumber){
+        int frequence = frequenceA*(int)Math.pow(2.0,noteNumber/12);
+        return frequence;
     }
 
 
