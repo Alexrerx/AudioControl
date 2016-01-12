@@ -12,8 +12,12 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import java.util.Arrays;
 
 public class MainActivity extends Activity {
+    TextView textView;
     FFTAnother fftAnother;
     Complex complex;
     FFTKuli_Turky fftKuliTurky;
@@ -32,8 +36,9 @@ public class MainActivity extends Activity {
     float sensivityRatio = (float) 0.01;
     AudioRecord audioRecord;
     boolean isReading = false;
-
+    int frequance;
     public final int frequenceA = 440;
+    public final short a110 = 110;
 public double basisDb = 0.0000000000001;
 
 
@@ -47,7 +52,7 @@ public double basisDb = 0.0000000000001;
         amplitudeColor = getResources().getColor(R.color.amplitude);
         maxAmplitudeColor = getResources().getColor(R.color.maxAmplitude);
 
-
+        textView = (TextView) findViewById(R.id.a110);
         pb = (ProgressBar) findViewById(R.id.progressBar);
         amplitudeLayoutTOP = (LinearLayout) findViewById(R.id.amplitudeLayoutTOP);
         amplitudeLayoutBOTTOM = (LinearLayout) findViewById(R.id.amplitudeLayoutBOTTOM);
@@ -114,18 +119,27 @@ public double basisDb = 0.0000000000001;
 //                    Log.e(TAG, "readCount = " + readCount + ", totalCount = "
 //                            + totalCount);
                     for (int i = 0; i < myBuffer.length; i++) {
-                        myBuffer[i] *= (sensivityRatio * window.Gausse(i, myBufferSize));
+                        myBuffer[i] *= (sensivityRatio * window.Hamming(i, myBufferSize));
                     }
-                    Complex[] spectrumComplex = fftAnother.DecimationInTime(complex.realToComplex(myBuffer), true);
-                   short[] spectrum = complex.complexToShort(spectrumComplex);
-                    magnitudeTransform(spectrum);
+
+                    //Complex[] spectrumComplex = fftAnother.DecimationInTime(complex.realToComplex(myBuffer), true);
+
+                   //short[] spectrum = complex.complexToShort(spectrumComplex);
+                    double[] spectrum = fftKuliTurky.Calculate(myBuffer);
+                    Log.i("wswsws = ", String.valueOf(getMax(spectrum)));
+
+                    //magnitudeTransform(spectrum);
+//
+//                    Log.i("ssss = ", String.valueOf(getMax(spectrum)));
 
                     setAFC(spectrum);
+
 //                    for (int k = 0;k < myBufferSize;k++){
 //                            fftKuliTurky.Calculate(myBuffer);
 //                            Log.i(TAG,Integer.toString() );
 //                        }
                 }
+
             }
         }).start();
 //        for (int k = 0;k < myBufferSize;k++){
@@ -134,6 +148,13 @@ public double basisDb = 0.0000000000001;
 //        }
 
 
+    }
+    public double getFrequence(short arr[]){
+        double f = 0;
+        for (int i = 0;i<arr.length;i++){
+            f = i*8000/arr.length;
+        }
+        return f;
     }
 
     private void setVisualization(final short data) {
@@ -176,7 +197,7 @@ public double basisDb = 0.0000000000001;
         }
     }
 
-    public void setAFC(short[] spectrum) {
+    public void setAFC(double[] spectrum) {
 
         for (int i = 0; i < myBufferSize / 2; i++) {
 //                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
@@ -224,19 +245,112 @@ public double basisDb = 0.0000000000001;
     }
 
     public short[] magnitudeTransform(short spectrum[]){
+        int j = 0;
+        short x = spectrum[0];
         maxAmplitudeColor = 0;
         for (int i = 0; i < spectrum.length / 2; i++) {
-            spectrum[i] *= window.Hamming(i, myBufferSize);
-            spectrum[i] *= window.Hamming(i, myBufferSize);
+           // spectrum[i] *= window.Hamming(i, myBufferSize);
+            //spectrum[i] *= window.Hamming(i, myBufferSize);
             if (spectrum[i] > spectrum[maxAmplitudeIndex]) {
                 maxAmplitudeIndex = i;
             }
+            if (spectrum[i]>x){
+                x = spectrum[i];
+                j = i;
+            }
+
+
+//                final int finalI = i;
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        textView.setText(spectrum[finalI]);
+//                    }
+//                });
+//
+
+        }
             //spectrum[i] /= spectrum.length;
             //spectrum[i] = (short)(10*Math.log10(spectrum[i]/basisDb));
 
-        }
         return spectrum;
     }
+
+    public double getMax(double[] arr){
+        double fr = 0;
+        double spectrumMax = arr[1];
+        for(short i = 0;i < arr.length;i++){
+            if (arr[i]>spectrumMax){
+                spectrumMax = arr[i];
+                fr = i;
+            }
+        }
+        return fr;
+    }
+        public static int calculate(int sampleRate, short [] audioData){
+
+        int numSamples = audioData.length;
+        int numCrossing = 0;
+        for (int p = 0; p < numSamples-1; p++)
+        {
+            if ((audioData[p] > 0 && audioData[p + 1] <= 0) ||
+                    (audioData[p] < 0 && audioData[p + 1] >= 0))
+            {
+                numCrossing++;
+            }
+        }
+        float numSecondsRecorded = (float)numSamples/(float)sampleRate;
+        float numCycles = numCrossing/2;
+        float frequency = numCycles/numSecondsRecorded;
+
+        return (int)frequency;
+    }
+
+//    public double getPitchInSampleRange(AudioSamples as, int start, int end) throws Exception {
+//        //If your sound is musical note/voice you need to limit the results because it wouldn't be above 4500Hz or bellow 20Hz
+//        int nLowPeriodInSamples = (int) as.getSamplingRate() / 4500;
+//        int nHiPeriodInSamples = (int) as.getSamplingRate() / 20;
+//
+//        //I get my sample values from my AudioSamples class. You can get them from wherever you want
+//        double[] samples = Arrays.copyOfRange((as.getSamplesChannelSegregated()[0]), start, end);
+//        if(samples.length < nHiPeriodInSamples) throw new Exception("Not enough samples");
+//
+//        //Since we're looking the periodicity in samples, in our case it won't be more than the difference in sample numbers
+//        double[] results = new double[nHiPeriodInSamples - nLowPeriodInSamples];
+//
+//        //Now you iterate the time lag
+//        for(int period = nLowPeriodInSamples; period < nHiPeriodInSamples; period++) {
+//            double sum = 0;
+//            //Autocorrelation is multiplication of the original and time lagged signal values
+//            for(int i = 0; i < samples.length - period; i++) {
+//                sum += samples[i]*samples[i + period];
+//            }
+//            //find the average value of the sum
+//            double mean = sum / (double)samples.length;
+//            //and put it into results as a value for some time lag.
+//            //You subtract the nLowPeriodInSamples for the index to start from 0.
+//            results[period - nLowPeriodInSamples] = mean;
+//        }
+//        //Now, it is obvious that the mean will be highest for time lag equal to the periodicity of the signal because in that case
+//        //most of the positive values will be multiplied with other positive and most of the negative values will be multiplied with other
+//        //negative resulting again as positive numbers and the sum will be high positive number. For example, in the other case, for let's say half period
+//        //autocorrelation will multiply negative with positive values resulting as negatives and you will get low value for the sum.
+//        double fBestValue = Double.MIN_VALUE;
+//        int nBestIndex = -1; //the index is the time lag
+//        //So
+//        //The autocorrelation is highest at the periodicity of the signal
+//        //The periodicity of the signal can be transformed to frequency
+//        for(int i = 0; i < results.length; i++) {
+//            if(results[i] > fBestValue) {
+//                nBestIndex = i;
+//                fBestValue = results[i];
+//            }
+//        }
+//        //Convert the period in samples to frequency and you got yourself a fundamental frequency of a sound
+//        double res = as.getSamplingRate() / (nBestIndex + nLowPeriodInSamples);
+//
+//        return res;
+//    }
 
     @Override
     protected void onDestroy() {
