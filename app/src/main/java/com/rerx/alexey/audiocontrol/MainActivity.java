@@ -15,6 +15,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
 
 public class MainActivity extends Activity {
     FFT fft;
@@ -66,6 +70,7 @@ public double basisDb = 0.0000000000001;
 
         Log.e(TAG, "init state = " + audioRecord.getState());
         initializeAFC();
+        setMaxAmplitudeColor();
     }
 
     void createAudioRecorder() {
@@ -136,6 +141,15 @@ public double basisDb = 0.0000000000001;
 //                            afc[j+1] = 100;
 //                        }
 //                    }
+
+                    LinkedHashMap<Short, Boolean> map = new LinkedHashMap<>();
+
+                    for (short i : afc) {
+                        map.put(i, true);
+                    }
+
+                    List<Short> list = (List<Short>) map.keySet();
+                    list.get(4);
 
                     Log.i("wswsws = ", String.valueOf(getFrequence(complex.complexToShort(spectrum))));
                     if ((getFrequence(afc)) == 328.125){
