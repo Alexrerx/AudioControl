@@ -17,6 +17,7 @@ import android.widget.TextView;
 import java.util.Arrays;
 
 public class MainActivity extends Activity {
+    FFT fft;
     TextView textView;
     FFTAnother fftAnother;
     Complex complex;
@@ -28,7 +29,7 @@ public class MainActivity extends Activity {
     HorizontalScrollView amplitudeScrollTOP, amplitudeScrollBOTTOM;
 
     Context context;
-    short myBufferSize = 256;
+    short myBufferSize = 512;
     int amplitudeColor;
     int maxAmplitudeColor;
     int maxAmplitudeIndex = 0;
@@ -37,9 +38,11 @@ public class MainActivity extends Activity {
     AudioRecord audioRecord;
     boolean isReading = false;
     int frequance;
-    public final int frequenceA = 440;
+    public final double frequenceA = 421.875;
     public final short a110 = 110;
 public double basisDb = 0.0000000000001;
+     String  NOTES[] = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
+ public int sampleRate = 8000;
 
 
 
@@ -66,7 +69,7 @@ public double basisDb = 0.0000000000001;
     }
 
     void createAudioRecorder() {
-        int sampleRate = 8000;
+
         int channelConfig = AudioFormat.CHANNEL_IN_MONO;
         int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
 
@@ -101,6 +104,7 @@ public double basisDb = 0.0000000000001;
         //fftKuliTurky = new FFTKuli_Turky();
         complex = new Complex();
         fftAnother = new FFTAnother();
+        fft = new FFT();
         Log.e(TAG, "read start ");
         isReading = true;
         new Thread(new Runnable() {
@@ -119,20 +123,47 @@ public double basisDb = 0.0000000000001;
 //                    Log.e(TAG, "readCount = " + readCount + ", totalCount = "
 //                            + totalCount);
                     for (int i = 0; i < myBuffer.length; i++) {
-                        myBuffer[i] *= (sensivityRatio * window.Hamming(i, myBufferSize));
+                        myBuffer[i] *= (sensivityRatio * window.Gausse(i, myBufferSize));
                     }
 
                     //Complex[] spectrumComplex = fftAnother.DecimationInTime(complex.realToComplex(myBuffer), true);
 
                    //short[] spectrum = complex.complexToShort(spectrumComplex);
-                    double[] spectrum = fftKuliTurky.Calculate(myBuffer);
-                    Log.i("wswsws = ", String.valueOf(getMax(spectrum)));
+                    Complex[] spectrum = fft.fft(complex.realToComplex(myBuffer));
+                    short[] afc = complex.complexToShort(spectrum);
+//                    for(int j = 0;j<afc.length;j++){
+//                        if((afc[j+1] == afc[j]) && (afc[j+1] != 0) && (afc[j]) != 0){
+//                            afc[j+1] = 100;
+//                        }
+//                    }
 
+                    Log.i("wswsws = ", String.valueOf(getFrequence(complex.complexToShort(spectrum))));
+                    if ((getFrequence(afc)) == 328.125){
+                        Log.e(TAG,"1st");
+                    }
+                    if((getFrequence(afc)/2) == 367.1875){
+                        Log.e(TAG,"1-2");
+                    }
+                    if((getFrequence(afc)/2) == 390.625){
+                        Log.e(TAG,"1-3");
+                    }
+                    if((getFrequence(afc)/2) == 218.75){
+                        Log.e(TAG,"1-5");
+                    }
+                    if(((getFrequence(afc)/2) == 484.375) || ((getFrequence(afc)/2) == 234.375)){
+                        Log.e(TAG,"1-7");
+                    }
+                    if((getFrequence(afc)/2) == 296.875){
+                        Log.e(TAG,"2-3");
+                    }
+                    if(getFrequence(afc) == 171.875){
+                        Log.e(TAG,String.valueOf((getFrequence(afc))/2));
+                    }
                     //magnitudeTransform(spectrum);
 //
 //                    Log.i("ssss = ", String.valueOf(getMax(spectrum)));
 
-                    setAFC(spectrum);
+                    setAFC(afc);
 
 //                    for (int k = 0;k < myBufferSize;k++){
 //                            fftKuliTurky.Calculate(myBuffer);
@@ -149,11 +180,9 @@ public double basisDb = 0.0000000000001;
 
 
     }
-    public double getFrequence(short arr[]){
+    public double getFrequence(short[] arr){
         double f = 0;
-        for (int i = 0;i<arr.length;i++){
-            f = i*8000/arr.length;
-        }
+            f = getMax(arr)*sampleRate/arr.length;
         return f;
     }
 
@@ -197,7 +226,7 @@ public double basisDb = 0.0000000000001;
         }
     }
 
-    public void setAFC(double[] spectrum) {
+    public void setAFC(short[] spectrum) {
 
         for (int i = 0; i < myBufferSize / 2; i++) {
 //                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
@@ -224,8 +253,8 @@ public double basisDb = 0.0000000000001;
         });
 
     }
-    public int frequeceFromA(int noteNumber){
-        int frequence = frequenceA*(int)Math.pow(2.0,noteNumber/12);
+    public double frequeceFromA(int noteNumber){
+        double frequence = frequenceA*(int)Math.pow(2.0,noteNumber/12);
         return frequence;
     }
 
@@ -275,8 +304,24 @@ public double basisDb = 0.0000000000001;
 
         return spectrum;
     }
+//    public short[] deleteOver(final short [] arr) {
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                for (int i = 0;i<arr.length;i++){
+//                    if(arr[i] % arr[1] == 0){
+//                        arr[i] = -1;
+//                    }
+//                }
+//            }
+//        });
+//        return arr;
+//    }
 
-    public double getMax(double[] arr){
+
+
+
+    public double getMax(short[] arr){
         double fr = 0;
         double spectrumMax = arr[1];
         for(short i = 0;i < arr.length;i++){
@@ -287,24 +332,24 @@ public double basisDb = 0.0000000000001;
         }
         return fr;
     }
-        public static int calculate(int sampleRate, short [] audioData){
-
-        int numSamples = audioData.length;
-        int numCrossing = 0;
-        for (int p = 0; p < numSamples-1; p++)
-        {
-            if ((audioData[p] > 0 && audioData[p + 1] <= 0) ||
-                    (audioData[p] < 0 && audioData[p + 1] >= 0))
-            {
-                numCrossing++;
-            }
-        }
-        float numSecondsRecorded = (float)numSamples/(float)sampleRate;
-        float numCycles = numCrossing/2;
-        float frequency = numCycles/numSecondsRecorded;
-
-        return (int)frequency;
-    }
+//        public static int calculate(int sampleRate, short [] audioData){
+//
+//        int numSamples = audioData.length;
+//        int numCrossing = 0;
+//        for (int p = 0; p < numSamples-1; p++)
+//        {
+//            if ((audioData[p] > 0 && audioData[p + 1] <= 0) ||
+//                    (audioData[p] < 0 && audioData[p + 1] >= 0))
+//            {
+//                numCrossing++;
+//            }
+//        }
+//        float numSecondsRecorded = (float)numSamples/(float)sampleRate;
+//        float numCycles = numCrossing/2;
+//        float frequency = numCycles/numSecondsRecorded;
+//
+//        return (int)frequency;
+//    }
 
 //    public double getPitchInSampleRange(AudioSamples as, int start, int end) throws Exception {
 //        //If your sound is musical note/voice you need to limit the results because it wouldn't be above 4500Hz or bellow 20Hz
