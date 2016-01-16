@@ -36,8 +36,9 @@ public class Complex {
      ******************************************************************************/
 
 
-    private double re;   // the real part
-    private double im;   // the imaginary part
+    public double re;   // the real part
+    public double im;   // the imaginary part
+    public double abs = Math.sqrt(re*re+im*im);
 
     // create a new object with the given real and imaginary parts
     public Complex(double real, double imag) {
@@ -60,7 +61,9 @@ public class Complex {
     public double abs() {
         return Math.hypot(re, im);
     }  // Math.sqrt(re*re + im*im)
-
+public double absOne(Complex a){
+    return Math.sqrt(a.re*a.re+a.im*a.im);
+}
     public double phase() {
         return Math.atan2(im, re);
     }  // between -pi and pi
@@ -162,11 +165,16 @@ public class Complex {
 
     public short[] complexToShort(Complex[]arr){
         short[] mas = new short[arr.length];
-        for (int i = 0;i<arr.length;i++){
-            short a = (short)arr[i].re;
-            mas[i] =  (short)Math.sqrt(arr[i].re*arr[i].re + arr[i].im*arr[i].im);
-           // mas[i] = a;
-        }
+        for (int i = 0;i<arr.length;i++) {
+            short a = (short) arr[i].re;
+//            short b = (short) arr[i].im;
+//            if (a < 0) {
+//                mas[i] = 0;
+//            } else {
+                mas[i] = (short) Math.sqrt(arr[i].re * arr[i].re + arr[i].im * arr[i].im);
+                // mas[i] = a;
+            }
+     //   }
         return mas;
     }
 }
