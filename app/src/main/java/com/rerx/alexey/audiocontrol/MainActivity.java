@@ -14,14 +14,10 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.lang.reflect.Array;
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
 
 public class MainActivity extends Activity {
     FFT fft;
@@ -50,7 +46,6 @@ public class MainActivity extends Activity {
 public double basisDb = 0.0000000000001;
      String  NOTES[] = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
  public int sampleRate = 8000;
-    int l,k;
     Complex[] frame0;
     Complex[] frame1;
     short ShiftsPerFrame = 16;
@@ -125,6 +120,9 @@ public double basisDb = 0.0000000000001;
                 if (audioRecord == null)
                     return;
 
+                double l = 0, k = 0, freq = 0;
+
+
                 myBuffer = new short[myBufferSize];
                 window = new Window();
                 int readCount = 0;
@@ -145,19 +143,18 @@ public double basisDb = 0.0000000000001;
 
                    //short[] spectrum = complex.complexToShort(spectrumComplex);
                     Complex[] spectrum = fft.fft(complex.realToComplex(myBuffer));
-                    short[] afc = complex.complexToShort(spectrum);
+                    final short[] afc = complex.complexToShort(spectrum);
 
 
-
-                   Complex[] spectrum0 = fftAnother.DecimationInTime(frame0, true);
-                    Complex[] spectrum1 = fftAnother.DecimationInTime(frame1, true);
-                    for (int r = 0; r < myBuffer.length; r++)
-                    {
-                        spectrum0[r].abs /= myBuffer.length;
-                        spectrum1[r].abs /= myBuffer.length;
-                    }
-                    Dictionary <Double,Double> spectrumNew = Filters.GetJoinedSpectrum(spectrum0, spectrum1, ShiftsPerFrame, sampleRate);
-//                    for(int i : spectrumNew){
+//                   Complex[] spectrum0 = fftAnother.DecimationInTime(frame0, true);
+//                    Complex[] spectrum1 = fftAnother.DecimationInTime(frame1, true);
+//                    for (int r = 0; r < myBuffer.length; r++)
+//                    {
+//                        spectrum0[r].abs /= myBuffer.length;
+//                        spectrum1[r].abs /= myBuffer.length;
+//                    }
+//                    Dictionary <Double,Double> spectrumNew = Filters.GetJoinedSpectrum(spectrum0, spectrum1, ShiftsPerFrame, sampleRate);
+////                    for(int i : spectrumNew){
 //
 //                    }
 
@@ -167,442 +164,437 @@ public double basisDb = 0.0000000000001;
 //                        }
 //                    }
 
-                    LinkedHashMap<Short, Boolean> map = new LinkedHashMap<>();
+                    LinkedHashMap<Double, Boolean> map = new LinkedHashMap<>();
 
 
-                    for (short i : afc) {
-                        map.put(i, true);
-                    }
+//                    for (double i : afc) {
+//                        map.put(i, true);
+//                    }
+//                    Short[] list=new Short[map.size()];
+//                    map.keySet().toArray(list);
+//                    for (int i = 0; i < list.length; i++) {
+//                        Log.d("LIST",String.valueOf(list[i]));
+//                    }
 
-                    //ArrayList<Short> list = (ArrayList<Short>) map.keySet();
-                    //list.get(4);
-                   // for(int h = 0;h<map.size();h++) {
-
+                    if (!(getFrequence(afc) == freq)) {
+                        freq = getFrequence(afc);
                         Log.i("wswsws = ", String.valueOf(getFrequence(afc)));
-                    if ((getFrequence(afc)) == 328.125){
-                        Log.e(TAG,"1st");
-                        k++;
-                    }else{
-                        l++;
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"1-1");
-                    }
-                    if((getFrequence(afc)/2) == 367.1875){
-                        Log.e(TAG,"1-2");
-                    }
-                    if((getFrequence(afc)) == 390.625){
-                        Log.e(TAG,"1-3");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"1-4");
-                    }
-                    if((getFrequence(afc)) == 421.875){
-                        Log.e(TAG,"1-5");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"1-6");
-                    }
-                    if(((getFrequence(afc)) == 484.375) || ((getFrequence(afc)) == 234.375)){
-                        Log.e(TAG,"1-7");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"1-8");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"1-9");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"1-10");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"1-11");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"1-12");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"1-13");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"1-14");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"1-15");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"1-16");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"1-17");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"1-18");
-                    }
-                    if ((getFrequence(afc)) ==1 ){
-                        Log.e(TAG,"1-19");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"1-20");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"1-21");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"2nd");
-                    }
-
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"2-1");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"2-2");
-                    }
-                    if((getFrequence(afc)) == 296.875){
-                        Log.e(TAG,"2-3");
-                    }
-                    if ((getFrequence(afc)) ==1 ){
-                        Log.e(TAG,"2-4");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"2-5");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"2-6");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"2-7");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"2-8");
-                    }
-                    if ((getFrequence(afc)) ==1 ){
-                        Log.e(TAG,"2-9");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"2-10");
-                    }
-                    if ((getFrequence(afc)) ==1 ){
-                        Log.e(TAG,"2-11");
-                    }
-                    if ((getFrequence(afc)) ==1 ){
-                        Log.e(TAG,"2-12");
-                    }
-                    if ((getFrequence(afc)) ==1 ){
-                        Log.e(TAG,"2-13");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"2-14");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"2-15");
-                    }
-                    if ((getFrequence(afc)) ==1 ){
-                        Log.e(TAG,"2-16");
-                    }
-                    if ((getFrequence(afc)) ==1 ){
-                        Log.e(TAG,"2-17");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"2-18");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"2-19");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"2-20");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"2-21");
-                    }
 
 
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3rd");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-1");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-2");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-3");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-4");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-5");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-6");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-7");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-8");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-9");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-10");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-11");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-12");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-13");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-14");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-15");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-16");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-17");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-18");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-19");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-20");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"3-21");
-                    }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                textView.setText(String.valueOf(getFrequence(afc)));
+                            }
+                        });
 
-                    /*****************BASS**********************/
-                    /******************4th*********************/
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4th");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-1");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-2");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-3");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-4");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-5");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-6");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-7");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-8");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-9");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-10");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-11");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-12");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-13");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-14");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-15");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-16");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-17");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-18");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-19");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-20");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"4-21");
-                    }
+                        if ((getFrequence(afc)) == 328.125) {
+                            Log.e(TAG, "1st");
+                            k++;
+                        } else {
+                            l++;
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "1-1");
+                        }
+                        if ((getFrequence(afc) / 2) == 367.1875) {
+                            Log.e(TAG, "1-2");
+                        }
+                        if ((getFrequence(afc)) == 390.625) {
+                            Log.e(TAG, "1-3");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "1-4");
+                        }
+                        if ((getFrequence(afc)) == 421.875) {
+                            Log.e(TAG, "1-5");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "1-6");
+                        }
+                        if (((getFrequence(afc)) == 484.375) || ((getFrequence(afc)) == 234.375)) {
+                            Log.e(TAG, "1-7");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "1-8");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "1-9");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "1-10");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "1-11");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "1-12");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "1-13");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "1-14");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "1-15");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "1-16");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "1-17");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "1-18");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "1-19");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "1-20");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "1-21");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2nd");
+                        }
 
-                    /*********************5th*******************/
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5th");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-1");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-2");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-3");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-4");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-5");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-6");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-7");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-8");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-9");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-10");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-11");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-12");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-13");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-14");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-15");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-16");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-17");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-18");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-19");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-20");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"5-21");
-                    }
-                    /******************6th********************/
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6th");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-2");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-3");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-4");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-5");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-6");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-7");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-8");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-9");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-10");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-11");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-12");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-13");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-14");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-15");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-16");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-17");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-18");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-19");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-20");
-                    }
-                    if ((getFrequence(afc)) == 1){
-                        Log.e(TAG,"6-21");
-                    }
-                    /***************МАРАЗМ ОКОНЧЕН*********************/
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-1");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-2");
+                        }
+                        if ((getFrequence(afc)) == 296.875) {
+                            Log.e(TAG, "2-3");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-4");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-5");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-6");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-7");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-8");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-9");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-10");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-11");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-12");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-13");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-14");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-15");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-16");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-17");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-18");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-19");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-20");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "2-21");
+                        }
 
 
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3rd");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-1");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-2");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-3");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-4");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-5");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-6");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-7");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-8");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-9");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-10");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-11");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-12");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-13");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-14");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-15");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-16");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-17");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-18");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-19");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-20");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "3-21");
+                        }
 
+                        /*****************BASS**********************/
+                        /******************4th*********************/
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4th");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-1");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-2");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-3");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-4");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-5");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-6");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-7");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-8");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-9");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-10");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-11");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-12");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-13");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-14");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-15");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-16");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-17");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-18");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-19");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-20");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "4-21");
+                        }
 
+                        /*********************5th*******************/
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5th");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-1");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-2");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-3");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-4");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-5");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-6");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-7");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-8");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-9");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-10");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-11");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-12");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-13");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-14");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-15");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-16");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-17");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-18");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-19");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-20");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "5-21");
+                        }
+                        /******************6th********************/
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6th");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-2");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-3");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-4");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-5");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-6");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-7");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-8");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-9");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-10");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-11");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-12");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-13");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-14");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-15");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-16");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-17");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-18");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-19");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-20");
+                        }
+                        if ((getFrequence(afc)) == 1) {
+                            Log.e(TAG, "6-21");
+                        }
+                        /***************МАРАЗМ ОКОНЧЕН*********************/
 
-
-
-
-
-
-
-
-
-
-
-
-                    if(getFrequence(afc) == 171.875){
-                        Log.e(TAG,String.valueOf((getFrequence(afc))/2));
                     }
                     //magnitudeTransform(spectrum);
 //
@@ -616,10 +608,19 @@ public double basisDb = 0.0000000000001;
 //                        }
                 }
 
+//                Log.d("K/L",String.valueOf(k/l));
+                final double kl = k / l;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        textView.setText("K/L=" + String.valueOf(kl));
+                    }
+                });
+
+
             }
         }).start();
-        Log.e("sdsdsd = ", String.valueOf(k));
-        Log.e("sdsdsd = ", String.valueOf(l));
+//
 //        for (int k = 0;k < myBufferSize;k++){
 //            fftKuliTurky.Calculate(myBuffer);
 //            Log.i(TAG,Integer.toString() );
