@@ -36,6 +36,14 @@
         android:layout_width="fill_parent"
         android:layout_height="20sp"
         android:indeterminate="false"/>
+
+    <TextView
+        android:layout_width="87dp"
+        android:layout_height="42dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:id="@+id/note"
+        android:layout_gravity="right" />
+
     <HorizontalScrollView android:id="@+id/amplitudeSCrollTOP"
                           android:layout_width="fill_parent"
                           android:layout_height="fill_parent"
@@ -49,6 +57,7 @@
             android:orientation="horizontal">
         </LinearLayout>
     </HorizontalScrollView>
+
     <HorizontalScrollView android:id="@+id/amplitudeSCrollBOTTOM"
                           android:layout_width="fill_parent"
                           android:layout_height="fill_parent"
