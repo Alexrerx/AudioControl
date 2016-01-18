@@ -164,7 +164,7 @@ public double basisDb = 0.0000000000001;
 //                        }
                     }
 
-                   setAFC(myBuffer);
+//                   setAFC(myBuffer);
                     //setAFC(getMaxByfferArray(myBuffer));
                     //Complex[] spectrumComplex = fftAnother.DecimationInTime(complex.realToComplex(myBuffer), true);
 
@@ -188,12 +188,11 @@ public double basisDb = 0.0000000000001;
                         spec1[r].abs /= myBuffer.length;
                     }
 
-                    Map<Double, Double> spectrumNew = Filters.GetJoinedSpectrum(spec0, spec1, ShiftsPerFrame, sampleRate);
-//                    for(int i : spectrumNew){
+                    LinkedHashMap<Integer, Integer> spectrumNew = Filters.GetJoinedSpectrum(spec0, spec1, ShiftsPerFrame, sampleRate);
 
+                    setAFC(spectrumNew);
 
-
-                    LinkedHashMap<Double, Boolean> map = new LinkedHashMap<>();
+//                    LinkedHashMap<Double, Boolean> map = new LinkedHashMap<>();
 
                     if ((!(getFrequence(afc) == freq)) || (getFrequence(afc)>1047) || (getFrequence(afc)<76))  {
                         freq = getFrequence(afc);
@@ -755,6 +754,26 @@ public double basisDb = 0.0000000000001;
         }
     }
 
+    public void setAFC(Map<Integer, Integer> spectrum) {
+        Log.d("MAP", "00000000");
+
+        for (int i : spectrum.keySet()) {
+
+//            updateAFC(i,spectrum.get(i));
+
+            Log.d("MAP", String.valueOf(spectrum.get(i)));
+
+        }
+
+//        for (int i = 0; i < myBufferSize / 2; i++) {
+//                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
+        //spectrum[i] *= window.Hamming(i, myBufferSize/2);
+//                        setVisualization(myBuffer[i]);
+//            updateAFC(i, (short) ((spectrum[i])));
+//        }
+//        setMaxAmplitudeColor();
+    }
+
     public void setAFC(short[] spectrum) {
 
         for (int i = 0; i < myBufferSize / 2; i++) {
@@ -766,7 +785,7 @@ public double basisDb = 0.0000000000001;
 //        setMaxAmplitudeColor();
     }
 
-    void updateAFC(final int index, final short amplitude) {
+    void updateAFC(final int index, final int amplitude) {
         maxAmplitudeColor = 0;
         runOnUiThread(new Runnable() {
             @Override

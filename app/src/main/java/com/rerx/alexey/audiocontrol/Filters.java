@@ -19,7 +19,7 @@ public class Filters {
     public final double SinglePi = Math.PI;
     public static final double DoublePi = 2 * Math.PI;
 
-    public static Map<Double, Double> GetJoinedSpectrum(
+    public static LinkedHashMap<Double, Double> GetJoinedSpectrum(
             ArrayList<Complex> spectrum0, ArrayList<Complex> spectrum1,
             double shiftsPerFrame, double sampleRate) {
 
@@ -27,7 +27,7 @@ public class Filters {
         double frameTime = frameSize / sampleRate;
         double shiftTime = frameTime / shiftsPerFrame;
         double binToFrequancy = sampleRate / frameSize;
-        Map<Double, Double> dictionary = new Hashtable<>();//new Dictionary
+        LinkedHashMap<Double, Double> dictionary = new LinkedHashMap<>();//new Dictionary
 
         for (int bin = 0; bin < frameSize; bin++) {
             double omegaExpected = DoublePi * (bin * binToFrequancy); // ω=2πf
@@ -43,7 +43,7 @@ public class Filters {
     }
 
 
-    public static Map<Double, Double> GetJoinedSpectrum(
+    public static LinkedHashMap<Integer, Integer> GetJoinedSpectrum(
             Complex[] spectrum0, Complex[] spectrum1,
             double shiftsPerFrame, double sampleRate) {
 
@@ -51,7 +51,7 @@ public class Filters {
         double frameTime = frameSize / sampleRate;
         double shiftTime = frameTime / shiftsPerFrame;
         double binToFrequancy = sampleRate / frameSize;
-        Map<Double, Double> dictionary = new Hashtable<>();//new Dictionary
+        LinkedHashMap<Integer, Integer> dictionary = new LinkedHashMap<>();//new Dictionary
 
         for (int bin = 0; bin < frameSize; bin++) {
             double omegaExpected = DoublePi * (bin * binToFrequancy); // ω=2πf
@@ -60,7 +60,7 @@ public class Filters {
             double binDelta = omegaDelta / (DoublePi * binToFrequancy);
             double frequancyActual = (bin + binDelta) * binToFrequancy;
             double magnitude = spectrum1[bin].abs() + spectrum0[bin].abs();
-            dictionary.put(frequancyActual, magnitude * (0.5 + Math.abs(binDelta)));
+            dictionary.put((int) Math.round(frequancyActual), (int) Math.round(magnitude * (0.5 + Math.abs(binDelta))));
         }
 
         return dictionary;
