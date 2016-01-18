@@ -157,18 +157,18 @@ public double basisDb = 0.0000000000001;
                    //short[] spectrum = complex.complexToShort(spectrumComplex);
                     Complex[] spectrum = fft.fft(complex.realToComplex(myBuffer));
                     final short[] afc = complex.complexToShort(spectrum);
-                    spectrum0.toArray(spec0);
-                   spec0 = fftAnother.DecimationInTime(frame0, true);
+//                    spectrum0.toArray(spec0);
+                    spec0 = fftAnother.DecimationInTime(frame0, true);
 
-                    spectrum1.toArray(spec1);
-                   spec1 = fftAnother.DecimationInTime(frame1, true);
+//                    spectrum1.toArray(spec1);
+                    spec1 = fftAnother.DecimationInTime(frame1, true);
                     for (int r = 0; r < myBuffer.length; r++)
                     {
                         spec0[r].abs /= myBuffer.length;
                         spec1[r].abs /= myBuffer.length;
                     }
 
-                    //Map<Double,Double> spectrumNew = Filters.GetJoinedSpectrum(spectrum0, spectrum1, ShiftsPerFrame, sampleRate);
+                    Map<Double, Double> spectrumNew = Filters.GetJoinedSpectrum(spec0, spec1, ShiftsPerFrame, sampleRate);
 //                    for(int i : spectrumNew){
 
 

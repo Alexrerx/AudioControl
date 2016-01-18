@@ -22,6 +22,7 @@ public class Filters {
     public static Map<Double, Double> GetJoinedSpectrum(
             ArrayList<Complex> spectrum0, ArrayList<Complex> spectrum1,
             double shiftsPerFrame, double sampleRate) {
+
         int frameSize = spectrum0.size();//?????
         double frameTime = frameSize / sampleRate;
         double shiftTime = frameTime / shiftsPerFrame;
@@ -35,6 +36,30 @@ public class Filters {
             double binDelta = omegaDelta / (DoublePi * binToFrequancy);
             double frequancyActual = (bin + binDelta) * binToFrequancy;
             double magnitude = spectrum1.get(bin).abs() + spectrum0.get(bin).abs();
+            dictionary.put(frequancyActual, magnitude * (0.5 + Math.abs(binDelta)));
+        }
+
+        return dictionary;
+    }
+
+
+    public static Map<Double, Double> GetJoinedSpectrum(
+            Complex[] spectrum0, Complex[] spectrum1,
+            double shiftsPerFrame, double sampleRate) {
+
+        int frameSize = spectrum0.length;//?????
+        double frameTime = frameSize / sampleRate;
+        double shiftTime = frameTime / shiftsPerFrame;
+        double binToFrequancy = sampleRate / frameSize;
+        Map<Double, Double> dictionary = new Hashtable<>();//new Dictionary
+
+        for (int bin = 0; bin < frameSize; bin++) {
+            double omegaExpected = DoublePi * (bin * binToFrequancy); // ω=2πf
+            double omegaActual = (spectrum1[bin].phase() - spectrum0[bin].phase()) / shiftTime; // ω=∂φ/∂t
+            double omegaDelta = Align(omegaActual - omegaExpected, DoublePi); // Δω=(∂ω + π)%2π - π
+            double binDelta = omegaDelta / (DoublePi * binToFrequancy);
+            double frequancyActual = (bin + binDelta) * binToFrequancy;
+            double magnitude = spectrum1[bin].abs() + spectrum0[bin].abs();
             dictionary.put(frequancyActual, magnitude * (0.5 + Math.abs(binDelta)));
         }
 
