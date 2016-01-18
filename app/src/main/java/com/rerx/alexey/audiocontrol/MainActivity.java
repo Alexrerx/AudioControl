@@ -136,7 +136,21 @@ public double basisDb = 0.0000000000001;
                 window = new Window();
                 int readCount = 0;
                 int totalCount = 0;
+                boolean first = true;
+
+                first = false;
+                readCount = audioRecord.read(myBuffer, 0, myBufferSize);
+                totalCount += readCount;
+                for (int i = 0; i < myBuffer.length; i++) {
+                    myBuffer[i] *= (sensivityRatio * window.Gausse(i, myBufferSize));
+//                        if (myBuffer[i+1] == myBuffer[i]){
+//                            myBuffer[i+1] = 0;
+//                        }
+                }
+                frame0 = complex.realToComplex(myBuffer);
+
                 while (isReading) {
+
                     readCount = audioRecord.read(myBuffer, 0, myBufferSize);
                     totalCount += readCount;
 //                    Log.e(TAG, "readCount = " + readCount + ", totalCount = "
@@ -158,10 +172,16 @@ public double basisDb = 0.0000000000001;
                     Complex[] spectrum = fft.fft(complex.realToComplex(myBuffer));
                     final short[] afc = complex.complexToShort(spectrum);
 //                    spectrum0.toArray(spec0);
+
+                    frame1 = complex.realToComplex(myBuffer);
+
                     spec0 = fftAnother.DecimationInTime(frame0, true);
 
 //                    spectrum1.toArray(spec1);
                     spec1 = fftAnother.DecimationInTime(frame1, true);
+
+                    frame0 = frame1;
+
                     for (int r = 0; r < myBuffer.length; r++)
                     {
                         spec0[r].abs /= myBuffer.length;
