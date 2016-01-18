@@ -759,8 +759,8 @@ public class MainActivity extends Activity {
 
         for (int i : spectrum.keySet()) {
 
-            updateAFC(i, spectrum.get(i));
-
+            updateAFC(i, (int) (0.05*spectrum.get(i)));
+            
 //            Log.d("MAP", String.valueOf(spectrum.get(i)));
 
         }
