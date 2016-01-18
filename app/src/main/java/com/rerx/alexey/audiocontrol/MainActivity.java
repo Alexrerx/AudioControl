@@ -37,7 +37,7 @@ public class MainActivity extends Activity {
     int amplitudeColor;
     int maxAmplitudeColor;
     int maxAmplitudeIndex = 0;
-    int barSize = 4;
+    int barSize = 1;
     float sensivityRatio = (float) 0.065;
     AudioRecord audioRecord;
     boolean isReading = false;
@@ -748,20 +748,20 @@ public double basisDb = 0.0000000000001;
     }
 
     void initializeAFC() {
-        for (int i = 0; i < myBufferSize; i++) {
+        for (int i = 0; i < 1100; i++) {
             setAmplitude(2, amplitudeLayoutTOP);
             setAmplitude(2, amplitudeLayoutBOTTOM);
         }
     }
 
     public void setAFC(Map<Integer, Integer> spectrum) {
-        Log.d("MAP", "00000000");
+//        Log.d("MAP", "00000000");
 
         for (int i : spectrum.keySet()) {
 
-//            updateAFC(i,spectrum.get(i));
+            updateAFC(i, spectrum.get(i));
 
-            Log.d("MAP", String.valueOf(spectrum.get(i)));
+//            Log.d("MAP", String.valueOf(spectrum.get(i)));
 
         }
 
@@ -787,26 +787,29 @@ public double basisDb = 0.0000000000001;
 
     void updateAFC(final int index, final int amplitude) {
         maxAmplitudeColor = 0;
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (amplitude > 0) {
-                    amplitudeLayoutTOP.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, amplitude));
-                    amplitudeLayoutBOTTOM.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, 0));
-                } else {
-                    amplitudeLayoutTOP.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, 0));
-                    amplitudeLayoutBOTTOM.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, -amplitude));
-                }
-            }
-        });
+        if (index < 1050) {
 
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (amplitude > 0) {
+                        amplitudeLayoutTOP.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, amplitude));
+                        amplitudeLayoutBOTTOM.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, 0));
+                    } else {
+                        amplitudeLayoutTOP.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, 0));
+                        amplitudeLayoutBOTTOM.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, -amplitude));
+                    }
+                }
+            });
+        }
     }
     public double frequeceFromA(int noteNumber){
         double frequence = frequenceA*(int)Math.pow(2.0,noteNumber/12);
         return frequence;
     }
 
-    void updateAFC_2(final int index, final short amplitude) {
+    void updateAFC_2(final int index, final int amplitude) {
+
         if (amplitude > 0) {
             setAmplitude(amplitude, amplitudeLayoutTOP);
             setAmplitude(0, amplitudeLayoutBOTTOM);
