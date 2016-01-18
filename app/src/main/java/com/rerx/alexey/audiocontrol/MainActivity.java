@@ -18,6 +18,7 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class MainActivity extends Activity {
     FFT fft;
@@ -51,7 +52,10 @@ public double basisDb = 0.0000000000001;
     short ShiftsPerFrame = 16;
     String note;
     TextView noteText;
-
+    ArrayList<Complex> spectrum1;
+    ArrayList<Complex> spectrum0;
+    Complex[] spec0;
+    Complex[] spec1;
 
 
     @Override
@@ -115,6 +119,8 @@ public double basisDb = 0.0000000000001;
         complex = new Complex();
         fftAnother = new FFTAnother();
         fft = new FFT();
+//        spec0 = new Complex[myBuffer.length];
+ //       spec 1 = new Complex[myBuffer.length];
         Log.e(TAG, "read start ");
         isReading = true;
         new Thread(new Runnable() {
@@ -135,6 +141,8 @@ public double basisDb = 0.0000000000001;
                     totalCount += readCount;
 //                    Log.e(TAG, "readCount = " + readCount + ", totalCount = "
 //                            + totalCount);
+
+                    Log.i("Max buffer",String.valueOf(getMaxByffer(myBuffer)));
                     for (int i = 0; i < myBuffer.length; i++) {
                         myBuffer[i] *= (sensivityRatio   * window.Gausse(i, myBufferSize));
 //                        if (myBuffer[i+1] == myBuffer[i]){
@@ -142,47 +150,34 @@ public double basisDb = 0.0000000000001;
 //                        }
                     }
 
-                    setAFC(myBuffer);
+                   setAFC(myBuffer);
+                    //setAFC(getMaxByfferArray(myBuffer));
                     //Complex[] spectrumComplex = fftAnother.DecimationInTime(complex.realToComplex(myBuffer), true);
 
                    //short[] spectrum = complex.complexToShort(spectrumComplex);
                     Complex[] spectrum = fft.fft(complex.realToComplex(myBuffer));
                     final short[] afc = complex.complexToShort(spectrum);
+                    spectrum0.toArray(spec0);
+                   spec0 = fftAnother.DecimationInTime(frame0, true);
+
+                    spectrum1.toArray(spec1);
+                   spec1 = fftAnother.DecimationInTime(frame1, true);
+                    for (int r = 0; r < myBuffer.length; r++)
+                    {
+                        spec0[r].abs /= myBuffer.length;
+                        spec1[r].abs /= myBuffer.length;
+                    }
+
+                    //Map<Double,Double> spectrumNew = Filters.GetJoinedSpectrum(spectrum0, spectrum1, ShiftsPerFrame, sampleRate);
+//                    for(int i : spectrumNew){
 
 
-//                   Complex[] spectrum0 = fftAnother.DecimationInTime(frame0, true);
-//                    Complex[] spectrum1 = fftAnother.DecimationInTime(frame1, true);
-//                    for (int r = 0; r < myBuffer.length; r++)
-//                    {
-//                        spectrum0[r].abs /= myBuffer.length;
-//                        spectrum1[r].abs /= myBuffer.length;
-//                    }
-//                    Dictionary <Double,Double> spectrumNew = Filters.GetJoinedSpectrum(spectrum0, spectrum1, ShiftsPerFrame, sampleRate);
-////                    for(int i : spectrumNew){
-//
-//                    }
-
-//                    for(int j = 0;j<afc.length;j++){
-//                        if((afc[j+1] == afc[j]) && (afc[j+1] != 0) && (afc[j]) != 0){
-//                            afc[j+1] = 100;
-//                        }
-//                    }
 
                     LinkedHashMap<Double, Boolean> map = new LinkedHashMap<>();
 
-
-//                    for (double i : afc) {
-//                        map.put(i, true);
-//                    }
-//                    Short[] list=new Short[map.size()];
-//                    map.keySet().toArray(list);
-//                    for (int i = 0; i < list.length; i++) {
-//                        Log.d("LIST",String.valueOf(list[i]));
-//                    }
-
                     if ((!(getFrequence(afc) == freq)) || (getFrequence(afc)>1047) || (getFrequence(afc)<76))  {
                         freq = getFrequence(afc);
-                        Log.i("wswsws = ", String.valueOf(getFrequence(afc)));
+                        //Log.i("wswsws = ", String.valueOf(freq));
 
 
                         runOnUiThread(new Runnable() {
@@ -651,7 +646,9 @@ public double basisDb = 0.0000000000001;
                             }
                         });
                     }
-                    //magnitudeTransform(spectrum);
+                }
+
+                //magnitudeTransform(spectrum);
 //
 //                    Log.i("ssss = ", String.valueOf(getMax(spectrum)));
 
@@ -673,7 +670,7 @@ public double basisDb = 0.0000000000001;
 //                });
 
 
-            }
+
         }).start();
 //
 //        for (int k = 0;k < myBufferSize;k++){
@@ -685,8 +682,17 @@ public double basisDb = 0.0000000000001;
     }
     public double getFrequence(short[] arr){
         double f = 0;
-            f = getMax(arr)*sampleRate/arr.length;
+            f = getMaxIndex(arr)*sampleRate/arr.length;
         return f;
+    }
+    public short getMaxByffer(short[] buffer){
+        short maxAmplitude = 0;
+        for (int i = 0; i<buffer.length; i++){
+            if (buffer[i] > maxAmplitude){
+                maxAmplitude = myBuffer[i];
+            }
+        }
+        return maxAmplitude;
     }
 
     private void setVisualization(final short data) {
@@ -824,7 +830,7 @@ public double basisDb = 0.0000000000001;
 
 
 
-    public double getMax(short[] arr){
+    public double getMaxIndex(short[] arr){
         double fr = 0;
         double spectrumMax = arr[0];
         for(short i = 0;i < arr.length;i++){
@@ -834,6 +840,17 @@ public double basisDb = 0.0000000000001;
             }
         }
         return fr;
+    }
+    public short[] getMaxByfferArray(short[] buffer){
+        short max = buffer[0];
+        short[] maxBufferArray = new short[buffer.length];
+        for (int i = 1; i< buffer.length; i++){
+            if (buffer[i] > max){
+                max = buffer[i];
+
+            }
+        }
+        return maxBufferArray;
     }
 //        public static int calculate(int sampleRate, short [] audioData){
 //
