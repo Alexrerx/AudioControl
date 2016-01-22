@@ -143,9 +143,6 @@ public class MainActivity extends Activity {
                 totalCount += readCount;
                 for (int i = 0; i < myBuffer.length; i++) {
                     myBuffer[i] *= (sensivityRatio * window.Gausse(i, myBufferSize));
-//                        if (myBuffer[i+1] == myBuffer[i]){
-//                            myBuffer[i+1] = 0;
-//                        }
                 }
                 frame0 = complex.realToComplex(myBuffer);
 
@@ -189,7 +186,7 @@ public class MainActivity extends Activity {
 
                     LinkedHashMap<Integer, Integer> spectrumNew = Filters.GetJoinedSpectrum(spec0, spec1, ShiftsPerFrame, sampleRate);
 
-                    setAFC(spectrumNew);
+                    setAFC((spectrumNew));
 
 //                    LinkedHashMap<Double, Boolean> map = new LinkedHashMap<>();
 
@@ -207,10 +204,7 @@ public class MainActivity extends Activity {
 
                         if ((getFrequence(afc)) == 328.125) {
                             Log.e(TAG, "1st");
-                            note = "1st";
-                            k++;
-                        } else {
-                            l++;
+                            note = "1-0";
                         }
                         if ((getFrequence(afc)) == 343.75) {
                             Log.e(TAG, "1-1");
@@ -240,62 +234,62 @@ public class MainActivity extends Activity {
                             Log.e(TAG, "1-7");
                             note = "1-7";
                         }
-                        if ((getFrequence(afc)) == 500) {
+                        if ((getFrequence(afc)) == 515.625) {
                             Log.e(TAG, "1-8");
                             note = "1-8";
                         }
-                        if ((getFrequence(afc)) == 531.25) {
+                        if ((getFrequence(afc)) == 546.875) {
                             Log.e(TAG, "1-9");
                             note = "1-9";
                         }
-                        if ((getFrequence(afc)) == 562.5) {
+                        if ((getFrequence(afc)) == 578.125) {
                             Log.e(TAG, "1-10");
                             note = "1-10";
                         }
-                        if ((getFrequence(afc)) == 593.75) {
+                        if ((getFrequence(afc)) == 609.375) {
                             Log.e(TAG, "1-11");
                             note = "1-11";
                         }
-                        if ((getFrequence(afc)) == 625) {
+                        if ((getFrequence(afc)) == 656.25) {
                             Log.e(TAG, "1-12");
                             note = "1-12";
                         }
-                        if ((getFrequence(afc)) == 671.875) {
+                        if ((getFrequence(afc)) == 687.5) {
                             Log.e(TAG, "1-13");
                             note = "1-13";
                         }
-                        if ((getFrequence(afc)) == 703.125) {
+                        if ((getFrequence(afc)) == 734.375) {
                             Log.e(TAG, "1-14");
                             note = "1-14";
                         }
-                        if ((getFrequence(afc)) == 750.0) {
+                        if ((getFrequence(afc)) == 781.25) {
                             Log.e(TAG, "1-15");
                             note = "1-15";
                         }
-                        if ((getFrequence(afc)) == 796.875) {
+                        if ((getFrequence(afc)) == 828.125) {
                             Log.e(TAG, "1-16");
                             note = "1-16";
                         }
-                        if ((getFrequence(afc)) == 828.125) {
+                        if ((getFrequence(afc)) == 875) {
                             Log.e(TAG, "1-17");
                             note = "1-17";
                         }
-                        if ((getFrequence(afc)) == 890.625) {
+                        if ((getFrequence(afc)) == 921.875) {
                             Log.e(TAG, "1-18");
                             note = "1-18";
                         }
-                        if ((getFrequence(afc)) == 953.125) {
+                        if ((getFrequence(afc)) == 984.375) {
                             Log.e(TAG, "1-19");
                             note = "1-19";
                         }
-                        if ((getFrequence(afc)) == 1000) {
+                        if ((getFrequence(afc)) == 1046.875) {
                             Log.e(TAG, "1-20");
                             note = "1-20";
                         }
-                        if ((getFrequence(afc)) == 1046.875) {
-                            Log.e(TAG, "1-21");
-                            note = "1-21";
-                        }
+//                        if ((getFrequence(afc)) == ) {
+//                            Log.e(TAG, "1-21");
+//                            note = "1-21";
+//                        }
 
                         /**********2nd********************/
                         if ((getFrequence(afc)) == 250) {
@@ -319,93 +313,99 @@ public class MainActivity extends Activity {
                             Log.e(TAG, "2-4");
                             note = "2-4";
                         }
-                        if ((getFrequence(afc)) == 328.125) {
-                            Log.e(TAG, "2-5");
-                            note = "2-5";
-                        }
-                        if ((getFrequence(afc)) == 343.75) {
-                            Log.e(TAG, "2-6");
-                            note = "2-6";
-                        }
-                        if ((getFrequence(afc)) == 375.0) {
-                            Log.e(TAG, "2-7");
-                            note = "2-7";
-                        }
-                        if ((getFrequence(afc)) == 390.625) {
-                            Log.e(TAG, "2-8");
-                            note = "2-8";
-                        }
-                        if ((getFrequence(afc)) == 406.25) {
-                            Log.e(TAG, "2-9");
-                            note = "2-9";
-                        }
-                        if ((getFrequence(afc)) == 437.5) {
-                            Log.e(TAG, "2-10");
-                            note = "2-10";
-                        }
-                        if ((getFrequence(afc)) == 468.75) {
-                            Log.e(TAG, "2-11");
-                            note = "2-11";
-                        }
-                        if ((getFrequence(afc)) == 484.375) {
-                            Log.e(TAG, "2-12");
-                            note = "2-12";
-                        }
-                        if ((getFrequence(afc)) == 515.625) {
-                            Log.e(TAG, "2-13");
-                            note = "2-13";
-                        }
-                        if ((getFrequence(afc)) == 546.875) {
-                            Log.e(TAG, "2-14");
-                            note = "2-14";
-                        }
-                        if ((getFrequence(afc)) == 578.125) {
-                            Log.e(TAG, "2-15");
-                            note = "2-15";
-                        }
-                        if ((getFrequence(afc)) == 625.0) {
-                            Log.e(TAG, "2-16");
-                            note = "2-16";
-                        }
-                        if ((getFrequence(afc)) == 656.25) {
-                            Log.e(TAG, "2-17");
-                            note = "2-17";
-                        }
-                        if ((getFrequence(afc)) == 687.5) {
-                            Log.e(TAG, "2-18");
-                            note = "2-18";
-                        }
-                        if ((getFrequence(afc)) == 718.75) {
-                            Log.e(TAG, "2-19");
-                            note = "2-19";
-                        }
-                        if ((getFrequence(afc)) == 765.625) {
-                            Log.e(TAG, "2-20");
-                            note = "2-20";
-                        }
-                        if ((getFrequence(afc)) == 812.5) {
-                            Log.e(TAG, "2-21");
-                            note = "2-21";
-                        }
+//                        if ((getFrequence(afc)) == 328.125) {
+//                            Log.e(TAG, "2-5");
+//                            note = "2-5";
+//                        }
+//                        if ((getFrequence(afc)) == 343.75) {
+//                            Log.e(TAG, "2-6");
+//                            note = "2-6";
+//                        }
+//                        if ((getFrequence(afc)) == 375.0) {
+//                            Log.e(TAG, "2-7");
+//                            note = "2-7";
+//                        }
+//                        if ((getFrequence(afc)) == 390.625) {
+//                            Log.e(TAG, "2-8");
+//                            note = "2-8";
+//                        }
+//                        if ((getFrequence(afc)) == 406.25) {
+//                            Log.e(TAG, "2-9");
+//                            note = "2-9";
+//                        }
+//                        if ((getFrequence(afc)) == 437.5) {
+//                            Log.e(TAG, "2-10");
+//                            note = "2-10";
+//                        }
+//                        if ((getFrequence(afc)) == 468.75) {
+//                            Log.e(TAG, "2-11");
+//                            note = "2-11";
+//                        }
+//                        if ((getFrequence(afc)) == 484.375) {
+//                            Log.e(TAG, "2-12");
+//                            note = "2-12";
+//                        }
+//                        if ((getFrequence(afc)) == 515.625) {
+//                            Log.e(TAG, "2-13");
+//                            note = "2-13";
+//                        }
+//                        if ((getFrequence(afc)) == 546.875) {
+//                            Log.e(TAG, "2-14");
+//                            note = "2-14";
+//                        }
+//                        if ((getFrequence(afc)) == 578.125) {
+//                            Log.e(TAG, "2-15");
+//                            note = "2-15";
+//                        }
+//                        if ((getFrequence(afc)) == 625.0) {
+//                            Log.e(TAG, "2-16");
+//                            note = "2-16";
+//                        }
+//                        if ((getFrequence(afc)) == 656.25) {
+//                            Log.e(TAG, "2-17");
+//                            note = "2-17";
+//                        }
+//                        if ((getFrequence(afc)) == 687.5) {
+//                            Log.e(TAG, "2-18");
+//                            note = "2-18";
+//                        }
+//                        if ((getFrequence(afc)) == 718.75) {
+//                            Log.e(TAG, "2-19");
+//                            note = "2-19";
+//                        }
+//                        if ((getFrequence(afc)) == 765.625) {
+//                            Log.e(TAG, "2-20");
+//                            note = "2-20";
+//                        }
+//                        if ((getFrequence(afc)) == 812.5) {
+//                            Log.e(TAG, "2-21");
+//                            note = "2-21";
+//                        }
 
 
-                        if ((getFrequence(afc)) == 1) {
+                        if ((getFrequence(afc)) == 187.5) {
                             Log.e(TAG, "3rd");
+                            note = "3-0";
                         }
-                        if ((getFrequence(afc)) == 1) {
+                        if ((getFrequence(afc)) == 203.125) {
                             Log.e(TAG, "3-1");
+                            note = "3-1";
                         }
-                        if ((getFrequence(afc)) == 1) {
+                        if ((getFrequence(afc)) == 218.75) {
                             Log.e(TAG, "3-2");
+                            note = "3-2";
                         }
-                        if ((getFrequence(afc)) == 1) {
+                        if ((getFrequence(afc)) == 234.375) {
                             Log.e(TAG, "3-3");
+                            note = "3-3";
                         }
                         if ((getFrequence(afc)) == 1) {
                             Log.e(TAG, "3-4");
+                            note = "3-4";
                         }
                         if ((getFrequence(afc)) == 1) {
                             Log.e(TAG, "3-5");
+                            note = "3-5";
                         }
                         if ((getFrequence(afc)) == 1) {
                             Log.e(TAG, "3-6");
@@ -458,14 +458,17 @@ public class MainActivity extends Activity {
 
                         /*****************BASS**********************/
                         /******************4th*********************/
-                        if ((getFrequence(afc)) == 1) {
+                        if ((getFrequence(afc)) == 140.625) {
                             Log.e(TAG, "4th");
+                            note = "4-0";
                         }
-                        if ((getFrequence(afc)) == 1) {
+                        if ((getFrequence(afc)) == 156.25) {
                             Log.e(TAG, "4-1");
+                            note = "4-1";
                         }
-                        if ((getFrequence(afc)) == 1) {
+                        if ((getFrequence(afc)) == 171.875) {
                             Log.e(TAG, "4-2");
+                            note = "4-2";
                         }
                         if ((getFrequence(afc)) == 1) {
                             Log.e(TAG, "4-3");
@@ -526,8 +529,9 @@ public class MainActivity extends Activity {
                         }
 
                         /*********************5th*******************/
-                        if ((getFrequence(afc)) == 1) {
-                            Log.e(TAG, "5th");
+                        if ((getFrequence(afc)) == 109.375) {
+                            Log.e(TAG, "5-0");
+                            note = "5-0";
                         }
                         if ((getFrequence(afc)) == 1) {
                             Log.e(TAG, "5-1");
@@ -535,8 +539,9 @@ public class MainActivity extends Activity {
                         if ((getFrequence(afc)) == 1) {
                             Log.e(TAG, "5-2");
                         }
-                        if ((getFrequence(afc)) == 1) {
+                        if ((getFrequence(afc)) == 125) {
                             Log.e(TAG, "5-3");
+                            note = "5-3";
                         }
                         if ((getFrequence(afc)) == 1) {
                             Log.e(TAG, "5-4");
@@ -593,8 +598,9 @@ public class MainActivity extends Activity {
                             Log.e(TAG, "5-21");
                         }
                         /******************6th********************/
-                        if ((getFrequence(afc)) == 1) {
-                            Log.e(TAG, "6th");
+                        if ((getFrequence(afc)) == 78.125) {
+                            Log.e(TAG, "6-0");
+                            note = "6-0";
                         }
                         if ((getFrequence(afc)) == 1) {
                             Log.e(TAG, "6-2");
@@ -760,7 +766,7 @@ public class MainActivity extends Activity {
         for (int i : spectrum.keySet()) {
 
             updateAFC(i, (int) (0.05*spectrum.get(i)));
-            
+
 //            Log.d("MAP", String.valueOf(spectrum.get(i)));
 
         }
@@ -777,9 +783,6 @@ public class MainActivity extends Activity {
     public void setAFC(short[] spectrum) {
 
         for (int i = 0; i < myBufferSize / 2; i++) {
-//                        Log.e(TAG, Integer.toString(i) + ":" + myBuffer[i] + ":" + (myBuffer[i]));
-            //spectrum[i] *= window.Hamming(i, myBufferSize/2);
-//                        setVisualization(myBuffer[i]);
             updateAFC(i, (short) ((spectrum[i])));
         }
 //        setMaxAmplitudeColor();
@@ -845,34 +848,10 @@ public class MainActivity extends Activity {
             }
 
 
-//                final int finalI = i;
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        textView.setText(spectrum[finalI]);
-//                    }
-//                });
-//
-
         }
-        //spectrum[i] /= spectrum.length;
-        //spectrum[i] = (short)(10*Math.log10(spectrum[i]/basisDb));
 
         return spectrum;
     }
-//    public short[] deleteOver(final short [] arr) {
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                for (int i = 0;i<arr.length;i++){
-//                    if(arr[i] % arr[1] == 0){
-//                        arr[i] = -1;
-//                    }
-//                }
-//            }
-//        });
-//        return arr;
-//    }
 
 
     public double getMaxIndex(short[] arr) {
@@ -898,70 +877,8 @@ public class MainActivity extends Activity {
         }
         return maxBufferArray;
     }
-//        public static int calculate(int sampleRate, short [] audioData){
-//
-//        int numSamples = audioData.length;
-//        int numCrossing = 0;
-//        for (int p = 0; p < numSamples-1; p++)
-//        {
-//            if ((audioData[p] > 0 && audioData[p + 1] <= 0) ||
-//                    (audioData[p] < 0 && audioData[p + 1] >= 0))
-//            {
-//                numCrossing++;
-//            }
-//        }
-//        float numSecondsRecorded = (float)numSamples/(float)sampleRate;
-//        float numCycles = numCrossing/2;
-//        float frequency = numCycles/numSecondsRecorded;
-//
-//        return (int)frequency;
-//    }
 
-//    public double getPitchInSampleRange(AudioSamples as, int start, int end) throws Exception {
-//        //If your sound is musical note/voice you need to limit the results because it wouldn't be above 4500Hz or bellow 20Hz
-//        int nLowPeriodInSamples = (int) as.getSamplingRate() / 4500;
-//        int nHiPeriodInSamples = (int) as.getSamplingRate() / 20;
-//
-//        //I get my sample values from my AudioSamples class. You can get them from wherever you want
-//        double[] samples = Arrays.copyOfRange((as.getSamplesChannelSegregated()[0]), start, end);
-//        if(samples.length < nHiPeriodInSamples) throw new Exception("Not enough samples");
-//
-//        //Since we're looking the periodicity in samples, in our case it won't be more than the difference in sample numbers
-//        double[] results = new double[nHiPeriodInSamples - nLowPeriodInSamples];
-//
-//        //Now you iterate the time lag
-//        for(int period = nLowPeriodInSamples; period < nHiPeriodInSamples; period++) {
-//            double sum = 0;
-//            //Autocorrelation is multiplication of the original and time lagged signal values
-//            for(int i = 0; i < samples.length - period; i++) {
-//                sum += samples[i]*samples[i + period];
-//            }
-//            //find the average value of the sum
-//            double mean = sum / (double)samples.length;
-//            //and put it into results as a value for some time lag.
-//            //You subtract the nLowPeriodInSamples for the index to start from 0.
-//            results[period - nLowPeriodInSamples] = mean;
-//        }
-//        //Now, it is obvious that the mean will be highest for time lag equal to the periodicity of the signal because in that case
-//        //most of the positive values will be multiplied with other positive and most of the negative values will be multiplied with other
-//        //negative resulting again as positive numbers and the sum will be high positive number. For example, in the other case, for let's say half period
-//        //autocorrelation will multiply negative with positive values resulting as negatives and you will get low value for the sum.
-//        double fBestValue = Double.MIN_VALUE;
-//        int nBestIndex = -1; //the index is the time lag
-//        //So
-//        //The autocorrelation is highest at the periodicity of the signal
-//        //The periodicity of the signal can be transformed to frequency
-//        for(int i = 0; i < results.length; i++) {
-//            if(results[i] > fBestValue) {
-//                nBestIndex = i;
-//                fBestValue = results[i];
-//            }
-//        }
-//        //Convert the period in samples to frequency and you got yourself a fundamental frequency of a sound
-//        double res = as.getSamplingRate() / (nBestIndex + nLowPeriodInSamples);
-//
-//        return res;
-//    }
+
 
     @Override
     protected void onDestroy() {

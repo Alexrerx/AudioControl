@@ -24,11 +24,10 @@
         </Button>
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="93dp"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:id="@+id/a110"
-            android:layout_weight="0.50" />
+            android:id="@+id/a110" />
     </LinearLayout>
     <ProgressBar
         android:id="@+id/progressBar"
@@ -38,17 +37,17 @@
         android:indeterminate="false"/>
 
     <TextView
-        android:layout_width="87dp"
-        android:layout_height="42dp"
+        android:textColor="#cc2424"
+        android:textSize="64sp"
+        android:layout_width="178dp"
+        android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:id="@+id/note"
         android:layout_gravity="right" />
 
     <HorizontalScrollView android:id="@+id/amplitudeSCrollTOP"
                           android:layout_width="fill_parent"
-                          android:layout_height="fill_parent"
-                          android:layout_weight="1"
-        >
+                          android:layout_height="273dp">
         <LinearLayout
             android:id="@+id/amplitudeLayoutTOP"
             android:layout_width="wrap_content"
