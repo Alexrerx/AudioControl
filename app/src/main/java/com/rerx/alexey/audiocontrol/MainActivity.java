@@ -190,7 +190,7 @@ public class MainActivity extends Activity {
 
 //                    LinkedHashMap<Double, Boolean> map = new LinkedHashMap<>();
 
-                    if ((!(getFrequence(afc) == freq)) || (getFrequence(afc) > 1047) || (getFrequence(afc) < 76)) {
+                    if ((!(getFrequence(afc) == freq)) && (getFrequence(afc) < 1047) && (getFrequence(afc) > 76)) {
                         freq = getFrequence(afc);
                         //Log.i("wswsws = ", String.valueOf(freq));
 
