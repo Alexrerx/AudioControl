@@ -166,15 +166,8 @@ public double absOne(Complex a){
     public short[] complexToShort(Complex[]arr){
         short[] mas = new short[arr.length];
         for (int i = 0;i<arr.length;i++) {
-            short a = (short) arr[i].re;
-//            short b = (short) arr[i].im;
-//            if (a < 0) {
-//                mas[i] = 0;
-//            } else {
                 mas[i] = (short) Math.sqrt(arr[i].re * arr[i].re + arr[i].im * arr[i].im);
-                // mas[i] = a;
             }
-     //   }
         return mas;
     }
 }
