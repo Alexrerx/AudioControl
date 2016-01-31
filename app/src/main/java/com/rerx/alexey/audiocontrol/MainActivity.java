@@ -169,52 +169,50 @@ public class MainActivity extends Activity {
         //       spec 1 = new Complex[myBuffer.length];
         Log.e(TAG, "read start ");
         isReading = true;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (audioRecord == null)
-                    return;
+        new Thread(() -> {
+            if (audioRecord == null)
+                return;
 
-                double l = 0, k = 0;
-                int freq = 0;
+            double l = 0, k = 0;
+            int freq = 0;
 
 
-                myBuffer = new short[myBufferSize];
-                myBufferOld = new short[myBufferSize];
-                window = new Window();
-                int readCount = 0;
-                int totalCount = 0;
-                boolean first = true;
+            myBuffer = new short[myBufferSize];
+            myBufferOld = new short[myBufferSize];
+            window = new Window();
+            int readCount = 0;
+            int totalCount = 0;
+            boolean first = true;
 
-                first = false;
+            first = false;
+            readCount = audioRecord.read(myBuffer, 0, myBufferSize);
+            totalCount += readCount;
+            for (int i = 0; i < myBuffer.length; i++) {
+                myBuffer[i] *= (sensivityRatio * window.Gausse(i, myBufferSize));
+            }
+            frame0 = complex.realToComplex(myBuffer);
+            myBufferOld = myBuffer;
+
+            while (isReading) {
+
                 readCount = audioRecord.read(myBuffer, 0, myBufferSize);
                 totalCount += readCount;
-                for (int i = 0; i < myBuffer.length; i++) {
-                    myBuffer[i] *= (sensivityRatio * window.Gausse(i, myBufferSize));
-                }
-                frame0 = complex.realToComplex(myBuffer);
-                myBufferOld = myBuffer;
-
-                while (isReading) {
-
-                    readCount = audioRecord.read(myBuffer, 0, myBufferSize);
-                    totalCount += readCount;
 //                    Log.e(TAG, "readCount = " + readCount + ", totalCount = "
 //                            + totalCount);
 
-                    Log.i("Max buffer", String.valueOf(getMaxByffer(myBuffer)));
-                    for (int i = 0; i < myBuffer.length; i++) {
-                        myBuffer[i] *= (sensivityRatio * window.Gausse(i, myBufferSize));
+                Log.i("Max buffer", String.valueOf(getMaxByffer(myBuffer)));
+                for (int i = 0; i < myBuffer.length; i++) {
+                    myBuffer[i] *= (sensivityRatio * window.Gausse(i, myBufferSize));
 //                        if (myBuffer[i+1] == myBuffer[i]){
 //                            myBuffer[i+1] = 0;
 //                        }
-                    }
+                }
 
 //                   setAFC(myBuffer);
-                    //setAFC(getMaxByfferArray(myBuffer));
-                    //Complex[] spectrumComplex = fftAnother.DecimationInTime(complex.realToComplex(myBuffer), true);
+                //setAFC(getMaxByfferArray(myBuffer));
+                //Complex[] spectrumComplex = fftAnother.DecimationInTime(complex.realToComplex(myBuffer), true);
 
-                    //short[] spectrum = complex.complexToShort(spectrumComplex);
+                //short[] spectrum = complex.complexToShort(spectrumComplex);
 //                    Complex[] spectrum = fft.fft(complex.realToComplex(myBuffer));
 
 
@@ -224,73 +222,56 @@ public class MainActivity extends Activity {
 //                    frame1 = complex.realToComplex(myBuffer);
 
 //                    spec0 = fftAnother.DecimationInTime(frame0, true);
-                    kuli0 = fftKuliTurky.Calculate(myBuffer);
+                kuli0 = fftKuliTurky.Calculate(myBuffer);
 
 //                    spectrum1.toArray(spec1);
 //                    spec1 = fftAnother.DecimationInTime(frame1, true);
-                    kuli1 = fftKuliTurky.Calculate(myBufferOld);
+                kuli1 = fftKuliTurky.Calculate(myBufferOld);
 
-                    myBufferOld = myBuffer;
+                myBufferOld = myBuffer;
 //                    frame0 = frame1;
 
 //                    for (int r = 0; r < myBuffer.length; r++) {
 //                        spec0[r].abs /= myBuffer.length;
 //                        spec1[r].abs /= myBuffer.length;
 //                    }
-                    for (int r = 0; r < myBuffer.length; r++) {
-                        kuli1[r] /= myBuffer.length;
-                        kuli0[r] /= myBuffer.length;
-                    }
+                for (int r = 0; r < myBuffer.length; r++) {
+                    kuli1[r] /= myBuffer.length;
+                    kuli0[r] /= myBuffer.length;
+                }
 
-                    final LinkedHashMap<Integer, Integer> spectrumNew = Filters.GetJoinedSpectrum(spec0, spec1, ShiftsPerFrame, sampleRate);
+                final LinkedHashMap<Integer, Integer> spectrumNew = Filters.GetJoinedSpectrum(spec0, spec1, ShiftsPerFrame, sampleRate);
 
 //                    setAFC((spectrumNew));  //Визуализация
 
 //                    LinkedHashMap<Double, Boolean> map = new LinkedHashMap<>();
 
 
-                    if (getFrequence(spectrumNew) != freq) {
-                        freq = getFrequence(spectrumNew);
-                        if ((freq > 60) && (freq < 1047)) {
+                if (getFrequence(spectrumNew) != freq) {
+                    freq = getFrequence(spectrumNew);
+                    if ((freq > 60) && (freq < 1047)) {
 
-                            final String finalFreq = String.valueOf(freq);
+                        final String finalFreq = String.valueOf(freq);
 
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    textView.setText(finalFreq);
-                                }
-                            });
+                        runOnUiThread(() -> textView.setText(finalFreq));
 
-                            determineNotes(freq);
-
-                        }
+                        determineNotes(freq);
 
                     }
-                }
 
-                //magnitudeTransform(spectrum);
+                }
+            }
+
+            //magnitudeTransform(spectrum);
 //
 //                    Log.i("ssss = ", String.valueOf(getMax(spectrum)));
 
-                //setAFC(afc);
+            //setAFC(afc);
 
 //                    for (int k = 0;k < myBufferSize;k++){
 //                            fftKuliTurky.Calculate(myBuffer);
 //                            Log.i(TAG,Integer.toString() );
 //                        }
-            }
-
-//                Log.d("K/L",String.valueOf(k/l));
-//                final double kl = k / l;
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        textView.setText("Хороших/Плохим=" + String.valueOf(kl));
-//                    }
-//                });
-
-
         }).start();
 //
 //        for (int k = 0;k < myBufferSize;k++){
@@ -325,12 +306,7 @@ public class MainActivity extends Activity {
     }
 
     private void setVisualization(final short data) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                pb.setProgress((data));
-            }
-        });
+        runOnUiThread(() -> pb.setProgress((data)));
 
     }
 
@@ -338,22 +314,12 @@ public class MainActivity extends Activity {
         final ImageView img = new ImageView(context);
         img.setLayoutParams(new LinearLayout.LayoutParams(barSize, amplitude));
         img.setBackgroundColor(amplitudeColor);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                layout.addView(img);
-            }
-        });
+        runOnUiThread(() -> layout.addView(img));
 //        amplitudeScrollTOP.scrollBy(10, 0);
     }
 
     public void setMaxAmplitudeColor() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                amplitudeLayoutTOP.getChildAt(maxAmplitudeIndex).setBackgroundColor(maxAmplitudeColor);
-            }
-        });
+        runOnUiThread(() -> amplitudeLayoutTOP.getChildAt(maxAmplitudeIndex).setBackgroundColor(maxAmplitudeColor));
 
     }
 
@@ -396,20 +362,17 @@ public class MainActivity extends Activity {
         maxAmplitudeColor = 0;
         if (index < 1050) {
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        if (amplitude > 0) {
-                            amplitudeLayoutTOP.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, amplitude));
-                            amplitudeLayoutBOTTOM.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, 0));
-                        } else {
-                            amplitudeLayoutTOP.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, 0));
-                            amplitudeLayoutBOTTOM.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, -amplitude));
-                        }
-                    } catch (Exception e) {
-                        Log.e("INDEX", String.valueOf(index));
+            runOnUiThread(() -> {
+                try {
+                    if (amplitude > 0) {
+                        amplitudeLayoutTOP.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, amplitude));
+                        amplitudeLayoutBOTTOM.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, 0));
+                    } else {
+                        amplitudeLayoutTOP.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, 0));
+                        amplitudeLayoutBOTTOM.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, -amplitude));
                     }
+                } catch (Exception e) {
+                    Log.e("INDEX", String.valueOf(index));
                 }
             });
         }
@@ -512,12 +475,7 @@ public class MainActivity extends Activity {
         } else {
             note = "";
         }
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                noteText.setText(note);
-            }
-        });
+        runOnUiThread(() -> noteText.setText(note));
 
     }
 
@@ -986,12 +944,7 @@ public class MainActivity extends Activity {
             Log.e(TAG, "6-21");
         }
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                noteText.setText(note);
-            }
-        });
+        runOnUiThread(() -> noteText.setText(note));
 
     }
 
