@@ -28,6 +28,14 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:id="@+id/a110" />
+        <TextView
+            android:textColor="#cc2424"
+            android:textSize="20sp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:id="@+id/note"
+            android:layout_gravity="right"/>
     </LinearLayout>
     <ProgressBar
         android:id="@+id/progressBar"
@@ -35,15 +43,6 @@
         android:layout_width="fill_parent"
         android:layout_height="20sp"
         android:indeterminate="false"/>
-
-    <TextView
-        android:textColor="#cc2424"
-        android:textSize="64sp"
-        android:layout_width="178dp"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:id="@+id/note"
-        android:layout_gravity="right" />
 
     <HorizontalScrollView android:id="@+id/amplitudeSCrollTOP"
                           android:layout_width="fill_parent"

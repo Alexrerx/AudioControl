@@ -17,12 +17,13 @@ import android.widget.TextView;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class MainActivity extends Activity {
     FFT fft;
-    TextView textView;
+    TextView textView, noteText;
     FFTAnother fftAnother;
     Complex complex;
     FFTKuli_Turky fftKuliTurky;
@@ -33,7 +34,7 @@ public class MainActivity extends Activity {
     HorizontalScrollView amplitudeScrollTOP, amplitudeScrollBOTTOM;
 
     Context context;
-    short myBufferSize = 512;
+    short myBufferSize = 2048;
     int amplitudeColor;
     int maxAmplitudeColor;
     int maxAmplitudeIndex = 0;
@@ -47,15 +48,13 @@ public class MainActivity extends Activity {
     public double basisDb = 0.0000000000001;
     String NOTES[] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
     public int sampleRate = 8000;
-    Complex[] frame0;
-    Complex[] frame1;
+    Complex[] frame0, frame1, spec0, spec1;
     short ShiftsPerFrame = 16;
     String note;
-    TextView noteText;
     ArrayList<Complex> spectrum1;
     ArrayList<Complex> spectrum0;
-    Complex[] spec0;
-    Complex[] spec1;
+
+    HashMap<Integer, String> notesMap = new HashMap<>();
 
 
     @Override
@@ -80,6 +79,50 @@ public class MainActivity extends Activity {
         Log.e(TAG, "init state = " + audioRecord.getState());
         initializeAFC();
         setMaxAmplitudeColor();
+
+        initializeMap();
+    }
+
+    private void initializeMap() {
+        notesMap.put(328, "1-0");
+        notesMap.put(343, "1-1");
+        notesMap.put(359, "1-2");
+        notesMap.put(390, "1-3");
+        notesMap.put(406, "1-4");
+        notesMap.put(437, "1-5");
+        notesMap.put(453, "1-6");
+        notesMap.put(484, "1-7");
+        notesMap.put(415, "1-8");
+        notesMap.put(546, "1-9");
+        notesMap.put(578, "1-10");
+        notesMap.put(609, "1-11");
+        notesMap.put(656, "1-12");
+        notesMap.put(687, "1-13");
+        notesMap.put(734, "1-14");
+        notesMap.put(781, "1-15");
+        notesMap.put(828, "1-16");
+        notesMap.put(875, "1-17");
+        notesMap.put(921, "1-18");
+        notesMap.put(984, "1-19");
+        notesMap.put(1046, "1-20");
+
+        notesMap.put(250, "2-0");
+        notesMap.put(265, "2-1");
+        notesMap.put(281, "2-2");
+        notesMap.put(296, "2-3");
+        notesMap.put(312, "2-4");
+
+        notesMap.put(187, "3-0");
+        notesMap.put(203, "3-1");
+        notesMap.put(218, "3-2");
+        notesMap.put(234, "3-3");
+
+        notesMap.put(140, "4-0");
+        notesMap.put(156, "4-1");
+        notesMap.put(171, "4-2");
+        notesMap.put(296, "4-3");
+        notesMap.put(312, "4-4");
+
     }
 
     void createAudioRecorder() {
@@ -129,7 +172,8 @@ public class MainActivity extends Activity {
                 if (audioRecord == null)
                     return;
 
-                double l = 0, k = 0, freq = 0;
+                double l = 0, k = 0;
+                int freq = 0;
 
 
                 myBuffer = new short[myBufferSize];
@@ -166,8 +210,10 @@ public class MainActivity extends Activity {
                     //Complex[] spectrumComplex = fftAnother.DecimationInTime(complex.realToComplex(myBuffer), true);
 
                     //short[] spectrum = complex.complexToShort(spectrumComplex);
-                    Complex[] spectrum = fft.fft(complex.realToComplex(myBuffer));
-                    final short[] afc = complex.complexToShort(spectrum);
+//                    Complex[] spectrum = fft.fft(complex.realToComplex(myBuffer));
+
+
+//                    final short[] afc = complex.complexToShort(spectrum);
 //                    spectrum0.toArray(spec0);
 
                     frame1 = complex.realToComplex(myBuffer);
@@ -186,31 +232,30 @@ public class MainActivity extends Activity {
 
                     final LinkedHashMap<Integer, Integer> spectrumNew = Filters.GetJoinedSpectrum(spec0, spec1, ShiftsPerFrame, sampleRate);
 
-                    setAFC((spectrumNew));
+//                    setAFC((spectrumNew));  //Визуализация
 
 //                    LinkedHashMap<Double, Boolean> map = new LinkedHashMap<>();
 
-                    if ((!(getFrequence(afc) == freq)) && (getFrequence(afc) < 1047) && (getFrequence(afc) > 76)) {
-                        freq = getFrequence(afc);
-                        //Log.i("wswsws = ", String.valueOf(freq));
 
+                    if (getFrequence(spectrumNew) != freq) {
+                        freq = getFrequence(spectrumNew);
+                        if ((freq > 60) && (freq < 1047)) {
 
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                textView.setText(String.valueOf(getFrequence(spectrumNew)));
-                            }
-                        });
+                            final String finalFreq = String.valueOf(freq);
 
-                        determineFreq(afc);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    textView.setText(finalFreq);
+                                }
+                            });
 
-                        /***************МАРАЗМ ОКОНЧЕН*********************/
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                noteText.setText(note);
-                            }
-                        });
+                            determineNotes(freq);
+
+                            /***************МАРАЗМ ОКОНЧЕН*********************/
+
+                        }
+
                     }
                 }
 
@@ -252,10 +297,10 @@ public class MainActivity extends Activity {
         return f;
     }
 
-    public double getFrequence(LinkedHashMap<Integer, Integer> map) {
+    public int getFrequence(LinkedHashMap<Integer, Integer> map) {
         double f = 0;
         f = getMaxIndex(map.values().toArray()) * sampleRate / map.size();
-        return f;
+        return (int) Math.round(f);
     }
 
 
@@ -314,7 +359,7 @@ public class MainActivity extends Activity {
 
         for (int i : spectrum.keySet()) {
 
-            updateAFC(i, (int) (0.05*spectrum.get(i)));
+            updateAFC(i, (int) (0.05 * spectrum.get(i)));
 
 //            Log.d("MAP", String.valueOf(spectrum.get(i)));
 
@@ -441,7 +486,6 @@ public class MainActivity extends Activity {
     }
 
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -451,7 +495,26 @@ public class MainActivity extends Activity {
         }
     }
 
+    void determineNotes(int frequence) {
+        String s = notesMap.get(frequence);
+        if (s != null) {
+            note = s;
+        } else {
+            note = "";
+        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                noteText.setText(note);
+            }
+        });
+
+    }
+
+
     void determineFreq(short[] afc) {
+
+
         if ((getFrequence(afc)) == 328.125) {
             Log.e(TAG, "1st");
             note = "1-0";
@@ -912,6 +975,13 @@ public class MainActivity extends Activity {
         if ((getFrequence(afc)) == 1) {
             Log.e(TAG, "6-21");
         }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                noteText.setText(note);
+            }
+        });
 
     }
 
