@@ -252,6 +252,13 @@ public class MainActivity extends Activity {
         return f;
     }
 
+    public double getFrequence(LinkedHashMap<Object, Object> map) {
+        double f = 0;
+        f = getMaxIndex(map.values().toArray()) * sampleRate / map.size();
+        return f;
+    }
+
+
     public short getMaxByffer(short[] buffer) {
         short maxAmplitude = 0;
         for (int i = 0; i < buffer.length; i++) {
@@ -407,6 +414,19 @@ public class MainActivity extends Activity {
         }
         return fr;
     }
+
+    public double getMaxIndex(Object[] arr) {
+        double fr = 0;
+        double spectrumMax = (double) arr[0];
+        for (short i = 0; i < arr.length; i++) {
+            if ((double) arr[i] > spectrumMax) {
+                spectrumMax = (double) arr[i];
+                fr = i;
+            }
+        }
+        return fr;
+    }
+
 
     public short[] getMaxByfferArray(short[] buffer) {
         short max = buffer[0];
