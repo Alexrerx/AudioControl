@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
     HorizontalScrollView amplitudeScrollTOP, amplitudeScrollBOTTOM;
 
     Context context;
-    short myBufferSize = 2048;
+    short myBufferSize = 4096;
     int amplitudeColor;
     int maxAmplitudeColor;
     int maxAmplitudeIndex = 0;
@@ -158,7 +158,7 @@ public class MainActivity extends Activity {
     short[] myBuffer;
 
     public void readStart() {
-        //fftKuliTurky = new FFTKuli_Turky();
+        fftKuliTurky = new FFTKuli_Turky();
         complex = new Complex();
         fftAnother = new FFTAnother();
         fft = new FFT();
@@ -218,7 +218,8 @@ public class MainActivity extends Activity {
 
                     frame1 = complex.realToComplex(myBuffer);
 
-                    spec0 = fftAnother.DecimationInTime(frame0, true);
+//                    spec0 = fftAnother.DecimationInTime(frame0, true);
+                   // spec0 = fftKuliTurky.Calculate();
 
 //                    spectrum1.toArray(spec1);
                     spec1 = fftAnother.DecimationInTime(frame1, true);
