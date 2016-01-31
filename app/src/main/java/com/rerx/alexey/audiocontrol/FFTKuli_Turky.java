@@ -15,7 +15,7 @@ public class FFTKuli_Turky {
     /// If amount of data items not equal a power of 2, then algorithm
     /// automatically pad with 0s to the lowest amount of power of 2.
     /// </remarks>
-    public static double[] Calculate(short[] x)//было double
+    public double[] Calculate(short[] x)//было double
     {
         int length;
         int bitsInLength;
@@ -75,7 +75,7 @@ public class FFTKuli_Turky {
     /// </summary>
     /// <param name="n">Number</param>
     /// <returns>Amount of minimal bits to store the number.</returns>
-    private static int Log2(int n)
+    private int Log2(int n)
     {
         int i = 0;
         while (n > 0)
@@ -91,7 +91,7 @@ public class FFTKuli_Turky {
     /// <param name="n">Number</param>
     /// <param name="bitsCount">Significant bits in the number.</param>
     /// <returns>Reversed binary number.</returns>
-    private static int ReverseBits(int n, int bitsCount)
+    private int ReverseBits(int n, int bitsCount)
     {
         int reversed = 0;
         for (int i = 0; i < bitsCount; i++)
@@ -109,7 +109,7 @@ public class FFTKuli_Turky {
     /// </summary>
     /// <param name="n">number</param>
     /// <returns>true if n=2^k and k is positive integer</returns>
-    private static boolean IsPowerOfTwo(int n)
+    private boolean IsPowerOfTwo(int n)
     {
         return n > 1 && (n & (n - 1)) == 0;
     }

@@ -48,7 +48,10 @@ public class MainActivity extends Activity {
     public double basisDb = 0.0000000000001;
     String NOTES[] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
     public int sampleRate = 8000;
+
     Complex[] frame0, frame1, spec0, spec1;
+    double[] kuli0, kuli1;
+
     short ShiftsPerFrame = 16;
     String note;
     ArrayList<Complex> spectrum1;
@@ -155,7 +158,7 @@ public class MainActivity extends Activity {
         audioRecord.stop();
     }
 
-    short[] myBuffer;
+    short[] myBuffer, myBufferOld;
 
     public void readStart() {
         fftKuliTurky = new FFTKuli_Turky();
@@ -177,6 +180,7 @@ public class MainActivity extends Activity {
 
 
                 myBuffer = new short[myBufferSize];
+                myBufferOld = new short[myBufferSize];
                 window = new Window();
                 int readCount = 0;
                 int totalCount = 0;
@@ -189,6 +193,7 @@ public class MainActivity extends Activity {
                     myBuffer[i] *= (sensivityRatio * window.Gausse(i, myBufferSize));
                 }
                 frame0 = complex.realToComplex(myBuffer);
+                myBufferOld = myBuffer;
 
                 while (isReading) {
 
@@ -216,19 +221,25 @@ public class MainActivity extends Activity {
 //                    final short[] afc = complex.complexToShort(spectrum);
 //                    spectrum0.toArray(spec0);
 
-                    frame1 = complex.realToComplex(myBuffer);
+//                    frame1 = complex.realToComplex(myBuffer);
 
 //                    spec0 = fftAnother.DecimationInTime(frame0, true);
-                   // spec0 = fftKuliTurky.Calculate();
+                    kuli0 = fftKuliTurky.Calculate(myBuffer);
 
 //                    spectrum1.toArray(spec1);
-                    spec1 = fftAnother.DecimationInTime(frame1, true);
+//                    spec1 = fftAnother.DecimationInTime(frame1, true);
+                    kuli1 = fftKuliTurky.Calculate(myBufferOld);
 
-                    frame0 = frame1;
+                    myBufferOld = myBuffer;
+//                    frame0 = frame1;
 
+//                    for (int r = 0; r < myBuffer.length; r++) {
+//                        spec0[r].abs /= myBuffer.length;
+//                        spec1[r].abs /= myBuffer.length;
+//                    }
                     for (int r = 0; r < myBuffer.length; r++) {
-                        spec0[r].abs /= myBuffer.length;
-                        spec1[r].abs /= myBuffer.length;
+                        kuli1[r] /= myBuffer.length;
+                        kuli0[r] /= myBuffer.length;
                     }
 
                     final LinkedHashMap<Integer, Integer> spectrumNew = Filters.GetJoinedSpectrum(spec0, spec1, ShiftsPerFrame, sampleRate);
@@ -252,8 +263,6 @@ public class MainActivity extends Activity {
                             });
 
                             determineNotes(freq);
-
-                            /***************МАРАЗМ ОКОНЧЕН*********************/
 
                         }
 
