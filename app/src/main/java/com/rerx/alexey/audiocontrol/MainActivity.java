@@ -184,7 +184,7 @@ public class MainActivity extends Activity {
                         spec1[r].abs /= myBuffer.length;
                     }
 
-                    LinkedHashMap<Integer, Integer> spectrumNew = Filters.GetJoinedSpectrum(spec0, spec1, ShiftsPerFrame, sampleRate);
+                    final LinkedHashMap<Integer, Integer> spectrumNew = Filters.GetJoinedSpectrum(spec0, spec1, ShiftsPerFrame, sampleRate);
 
                     setAFC((spectrumNew));
 
@@ -198,7 +198,7 @@ public class MainActivity extends Activity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                textView.setText(String.valueOf(getFrequence(afc)));
+                                textView.setText(String.valueOf(getFrequence(spectrumNew)));
                             }
                         });
 
@@ -252,7 +252,7 @@ public class MainActivity extends Activity {
         return f;
     }
 
-    public double getFrequence(LinkedHashMap<Object, Object> map) {
+    public double getFrequence(LinkedHashMap<Integer, Integer> map) {
         double f = 0;
         f = getMaxIndex(map.values().toArray()) * sampleRate / map.size();
         return f;
@@ -417,10 +417,10 @@ public class MainActivity extends Activity {
 
     public double getMaxIndex(Object[] arr) {
         double fr = 0;
-        double spectrumMax = (double) arr[0];
+        Integer spectrumMax = (Integer) arr[0];
         for (short i = 0; i < arr.length; i++) {
-            if ((double) arr[i] > spectrumMax) {
-                spectrumMax = (double) arr[i];
+            if ((Integer) arr[i] > spectrumMax) {
+                spectrumMax = (Integer) arr[i];
                 fr = i;
             }
         }
