@@ -14,8 +14,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -27,14 +25,14 @@ public class MainActivity extends Activity {
     FFTAnother fftAnother;
     Complex complex;
     FFTKuli_Turky fftKuliTurky;
+    Tablature tab;
     final String TAG = "myLogs";
     Window window;
-    ProgressBar pb;
     LinearLayout amplitudeLayoutTOP, amplitudeLayoutBOTTOM;
     HorizontalScrollView amplitudeScrollTOP, amplitudeScrollBOTTOM;
 
     Context context;
-    short myBufferSize = 4096;
+    short myBufferSize = 1024;
     int amplitudeColor;
     int maxAmplitudeColor;
     int maxAmplitudeIndex = 0;
@@ -66,12 +64,14 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         context = this;
+
+        tab = new Tablature(context);
+
         amplitudeColor = getResources().getColor(R.color.amplitude);
         maxAmplitudeColor = getResources().getColor(R.color.maxAmplitude);
 
         textView = (TextView) findViewById(R.id.a110);
         noteText = (TextView) findViewById(R.id.note);
-        pb = (ProgressBar) findViewById(R.id.progressBar);
         amplitudeLayoutTOP = (LinearLayout) findViewById(R.id.amplitudeLayoutTOP);
         amplitudeLayoutBOTTOM = (LinearLayout) findViewById(R.id.amplitudeLayoutBOTTOM);
 
@@ -84,15 +84,37 @@ public class MainActivity extends Activity {
         setMaxAmplitudeColor();
 
         initializeMap();
+//        testTab();
+
     }
 
     private void initializeMap() {
-        notesMap.put(328, "1-0");
-        notesMap.put(343, "1-1");
-        notesMap.put(359, "1-2");
-        notesMap.put(390, "1-3");
-        notesMap.put(406, "1-4");
-        notesMap.put(437, "1-5");
+
+        notesMap.put(183, "5-0");
+
+        notesMap.put(147, "4-0");
+        notesMap.put(154, "4-1");
+        notesMap.put(165, "4-2");
+        notesMap.put(175, "4-3");
+        notesMap.put(183, "4-4");
+
+        notesMap.put(194, "3-0");
+        notesMap.put(208, "3-1");
+        notesMap.put(218, "3-2");
+        notesMap.put(233, "3-3");
+
+        notesMap.put(247, "2-0");
+        notesMap.put(261, "2-1");
+        notesMap.put(279, "2-2");
+        notesMap.put(294, "2-3");
+        notesMap.put(312, "2-4");
+
+        notesMap.put(332, "1-0");
+        notesMap.put(354, "1-1");
+        notesMap.put(369, "1-2");
+        notesMap.put(393, "1-3");
+        notesMap.put(420, "1-4");
+        notesMap.put(441, "1-5");
         notesMap.put(453, "1-6");
         notesMap.put(484, "1-7");
         notesMap.put(415, "1-8");
@@ -108,23 +130,6 @@ public class MainActivity extends Activity {
         notesMap.put(921, "1-18");
         notesMap.put(984, "1-19");
         notesMap.put(1046, "1-20");
-
-        notesMap.put(250, "2-0");
-        notesMap.put(265, "2-1");
-        notesMap.put(281, "2-2");
-        notesMap.put(296, "2-3");
-        notesMap.put(312, "2-4");
-
-        notesMap.put(187, "3-0");
-        notesMap.put(203, "3-1");
-        notesMap.put(218, "3-2");
-        notesMap.put(234, "3-3");
-
-        notesMap.put(140, "4-0");
-        notesMap.put(156, "4-1");
-        notesMap.put(171, "4-2");
-        notesMap.put(296, "4-3");
-        notesMap.put(312, "4-4");
 
     }
 
@@ -160,13 +165,14 @@ public class MainActivity extends Activity {
 
     short[] myBuffer, myBufferOld;
 
+
     public void readStart() {
         fftKuliTurky = new FFTKuli_Turky();
         complex = new Complex();
         fftAnother = new FFTAnother();
         fft = new FFT();
 //        spec0 = new Complex[myBuffer.length];
-        //       spec 1 = new Complex[myBuffer.length];
+//        spec1 = new Complex[myBuffer.length];
         Log.e(TAG, "read start ");
         isReading = true;
         new Thread(() -> {
@@ -191,7 +197,7 @@ public class MainActivity extends Activity {
                 myBuffer[i] *= (sensivityRatio * window.Gausse(i, myBufferSize));
             }
             frame0 = complex.realToComplex(myBuffer);
-            myBufferOld = myBuffer;
+//            myBufferOld = myBuffer;
 
             while (isReading) {
 
@@ -202,7 +208,7 @@ public class MainActivity extends Activity {
 
                 Log.i("Max buffer", String.valueOf(getMaxByffer(myBuffer)));
                 for (int i = 0; i < myBuffer.length; i++) {
-                    myBuffer[i] *= (sensivityRatio * window.Gausse(i, myBufferSize));
+                    myBuffer[i] *= (sensivityRatio * window.Hamming(i, myBufferSize));
 //                        if (myBuffer[i+1] == myBuffer[i]){
 //                            myBuffer[i+1] = 0;
 //                        }
@@ -219,29 +225,29 @@ public class MainActivity extends Activity {
 //                    final short[] afc = complex.complexToShort(spectrum);
 //                    spectrum0.toArray(spec0);
 
-//                    frame1 = complex.realToComplex(myBuffer);
+                frame1 = complex.realToComplex(myBuffer);
 
-//                    spec0 = fftAnother.DecimationInTime(frame0, true);
-                kuli0 = fftKuliTurky.Calculate(myBuffer);
+                spec0 = fftAnother.DecimationInTime(frame0, true);
+//                kuli0 = fftKuliTurky.Calculate(myBuffer);
 
 //                    spectrum1.toArray(spec1);
-//                    spec1 = fftAnother.DecimationInTime(frame1, true);
-                kuli1 = fftKuliTurky.Calculate(myBufferOld);
+                spec1 = fftAnother.DecimationInTime(frame1, true);
+//                kuli1 = fftKuliTurky.Calculate(myBufferOld);
 
-                myBufferOld = myBuffer;
-//                    frame0 = frame1;
+//                myBufferOld = myBuffer;
+                frame0 = frame1;
 
-//                    for (int r = 0; r < myBuffer.length; r++) {
-//                        spec0[r].abs /= myBuffer.length;
-//                        spec1[r].abs /= myBuffer.length;
-//                    }
                 for (int r = 0; r < myBuffer.length; r++) {
-                    kuli1[r] /= myBuffer.length;
-                    kuli0[r] /= myBuffer.length;
+                    spec0[r].abs /= myBuffer.length;
+                    spec1[r].abs /= myBuffer.length;
                 }
+//                for (int r = 0; r < myBuffer.length; r++) {
+//                    kuli1[r] /= myBuffer.length;
+//                    kuli0[r] /= myBuffer.length;
+//                }
 
                 final LinkedHashMap<Integer, Integer> spectrumNew = Filters.GetJoinedSpectrum(spec0, spec1, ShiftsPerFrame, sampleRate);
-
+//                double[] spectrumNew = kuli0;
 //                    setAFC((spectrumNew));  //Визуализация
 
 //                    LinkedHashMap<Double, Boolean> map = new LinkedHashMap<>();
@@ -256,6 +262,7 @@ public class MainActivity extends Activity {
                         runOnUiThread(() -> textView.setText(finalFreq));
 
                         determineNotes(freq);
+                        tab.addNote(note);
 
                     }
 
@@ -266,7 +273,7 @@ public class MainActivity extends Activity {
 //
 //                    Log.i("ssss = ", String.valueOf(getMax(spectrum)));
 
-            //setAFC(afc);
+//            setAFC(afc);
 
 //                    for (int k = 0;k < myBufferSize;k++){
 //                            fftKuliTurky.Calculate(myBuffer);
@@ -280,6 +287,12 @@ public class MainActivity extends Activity {
 //        }
 
 
+    }
+
+    public int getFrequence(double[] arr) {
+        double f = 0;
+        f = getMaxIndex(arr) * sampleRate / arr.length;
+        return (int) Math.round(f);
     }
 
     public double getFrequence(short[] arr) {
@@ -303,11 +316,6 @@ public class MainActivity extends Activity {
             }
         }
         return maxAmplitude;
-    }
-
-    private void setVisualization(final short data) {
-        runOnUiThread(() -> pb.setProgress((data)));
-
     }
 
     public void setAmplitude(int amplitude, final LinearLayout layout) {
@@ -420,6 +428,18 @@ public class MainActivity extends Activity {
         return spectrum;
     }
 
+    public double getMaxIndex(double[] arr) {
+        double fr = 0;
+        double spectrumMax = arr[0];
+        for (short i = 0; i < arr.length; i++) {
+            if (arr[i] > spectrumMax) {
+                spectrumMax = arr[i];
+                fr = i;
+            }
+        }
+        return fr;
+    }
+
 
     public double getMaxIndex(short[] arr) {
         double fr = 0;
@@ -474,6 +494,7 @@ public class MainActivity extends Activity {
             note = s;
         } else {
             note = "";
+            return;
         }
         runOnUiThread(() -> noteText.setText(note));
 

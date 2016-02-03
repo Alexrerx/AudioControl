@@ -30,6 +30,7 @@ public class FFTAnother {
             Complex[] spectrumEven = DecimationInTime(frameEven, direct);
 
             double arg = direct ? -DoublePi/frameFullSize : DoublePi/frameFullSize;
+//            Complex omegaPowBase = new Complex(Math.cos(arg)+Math.cos(2*arg)+Math.cos(4*arg)+Math.cos(8*arg)+Math.cos(10*arg), Math.sin(arg)+Math.sin(2*arg)+Math.sin(4*arg)+Math.cos(8 * arg)+Math.sin(10*arg));
             Complex omegaPowBase = new Complex(Math.cos(arg), Math.sin(arg));
             Complex omega = new Complex(1.0,0.0);
             Complex[] spectrum = new Complex[frameFullSize];

@@ -4,4 +4,5 @@
     <string name="stop_record">Stop record</string>
     <string name="start_read">Start read</string>
     <string name="stop_read">Stop read</string>
+    <string name="fret_default">--</string>
 </resources>

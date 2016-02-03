@@ -7,66 +7,83 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
     <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:weightSum="1">
+        android:layout_height="match_parent"
+        android:layout_weight="9">
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:onClick="recordStart"
             android:text="@string/start_record">
         </Button>
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
             android:onClick="recordStop"
             android:text="@string/stop_record">
         </Button>
 
         <TextView
-            android:layout_width="93dp"
-            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_gravity="center_horizontal|center_vertical"
             android:id="@+id/a110" />
         <TextView
+            android:layout_weight="2"
             android:textColor="#cc2424"
             android:textSize="20sp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:id="@+id/note"
-            android:layout_gravity="right"/>
+            android:layout_gravity="end"/>
     </LinearLayout>
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="20sp"
-        android:indeterminate="false"/>
 
     <HorizontalScrollView android:id="@+id/amplitudeSCrollTOP"
-                          android:layout_width="fill_parent"
-                          android:layout_height="273dp">
+                          android:layout_width="match_parent"
+                          android:layout_height="match_parent"
+                          android:layout_weight="8">
         <LinearLayout
             android:id="@+id/amplitudeLayoutTOP"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:gravity="bottom"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            tools:ignore="ScrollViewSize">
         </LinearLayout>
     </HorizontalScrollView>
 
     <HorizontalScrollView android:id="@+id/amplitudeSCrollBOTTOM"
-                          android:layout_width="fill_parent"
-                          android:layout_height="fill_parent"
-                          android:layout_weight="1"
+                          android:layout_width="match_parent"
+                          android:layout_height="match_parent"
+                          android:layout_weight="8"
         >
         <LinearLayout
             android:id="@+id/amplitudeLayoutBOTTOM"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:gravity="top"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            tools:ignore="ScrollViewSize">
+        </LinearLayout>
+    </HorizontalScrollView>
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="5"
+        android:background="@color/tab">
+        <LinearLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="top"
+            android:orientation="horizontal"
+            tools:ignore="ScrollViewSize">
         </LinearLayout>
     </HorizontalScrollView>
 
