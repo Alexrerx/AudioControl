@@ -5,4 +5,8 @@
     <string name="start_read">Start read</string>
     <string name="stop_read">Stop read</string>
     <string name="fret_default">--</string>
+    <string name="new_bar">|</string>
+    <string name="choose_bpm">Укажите темп игры</string>
+    <string name="choosen_defaul_bpm">Выбран темп по-умолчанию (120 bpm)</string>
+    <string name="ok">Ok</string>
 </resources>

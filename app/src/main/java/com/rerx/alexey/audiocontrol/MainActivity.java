@@ -1,6 +1,7 @@
 package com.rerx.alexey.audiocontrol;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -11,8 +12,8 @@ import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -149,19 +150,45 @@ public class MainActivity extends Activity {
                 sampleRate, channelConfig, audioFormat, internalBufferSize);
     }
 
-    public void recordStart(View v) {
+    final Object object = "3";
+
+    public void onRecorsStartClick(View v) {
+        new AlertDialog.Builder(context)
+                .setMessage(getString(R.string.choose_bpm))
+                .setCancelable(true)
+                .setOnCancelListener((view) -> {
+                    tab.setTempo(120);
+                    Toast.makeText(context, getString(R.string.choosen_defaul_bpm),
+                            Toast.LENGTH_SHORT).show();
+                })
+                .setView(tab.getBpmSetter())
+                .setPositiveButton(getString(R.string.ok), (dialog, which) -> {
+                    startRecord();
+                })
+                .create()
+                .show();
+    }
+
+    public void startRecord() {
         Log.e(TAG, "record start");
         audioRecord.startRecording();
         int recordingState = audioRecord.getRecordingState();
         Log.e(TAG, "recordingState = " + recordingState);
         readStart();
+        tab.startRecord();
     }
 
-    public void recordStop(View v) {
+    public void onRecordStopClick(View v) {
+        stopRecord();
+    }
+
+    private void stopRecord() {
         readStop();
         Log.e(TAG, "record stop ");
         audioRecord.stop();
+        tab.stopRecord();
     }
+
 
     short[] myBuffer, myBufferOld;
 
@@ -175,6 +202,7 @@ public class MainActivity extends Activity {
 //        spec1 = new Complex[myBuffer.length];
         Log.e(TAG, "read start ");
         isReading = true;
+
         new Thread(() -> {
             if (audioRecord == null)
                 return;
