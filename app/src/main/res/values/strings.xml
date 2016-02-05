@@ -7,6 +7,13 @@
     <string name="fret_default">--</string>
     <string name="new_bar">|</string>
     <string name="choose_bpm">Укажите темп игры</string>
+    <string name="ok">Ок</string>
+    <string name="cancel">Отмена</string>
     <string name="choosen_defaul_bpm">Выбран темп по-умолчанию (120 bpm)</string>
-    <string name="ok">Ok</string>
+    <string name="pause_record">Пауза</string>
+    <string name="tab_saving_error">Невозможно сохранить файл</string>
+    <string name="unexpected_err">Произошла внутренняя ошибка!</string>
+    <string name="exit">Выход</string>
+    <string name="folder_not_found">Не найдена папка конфигураций</string>
+
 </resources>

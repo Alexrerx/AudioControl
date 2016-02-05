@@ -1,14 +1,13 @@
 package com.rerx.alexey.audiocontrol;
 
-import android.app.ActionBar;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,27 +15,33 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 /**
+ * l
  * Created by mihail on 03.02.16.
  */
 public class Tablature {
 
-    HorizontalScrollView tabScroll;
+    private HorizontalScrollView tabScroll;
+    private Spinner bpmSetter;
 
-    Context context;
-    LinearLayout tabLayout;
-    MainActivity mainActivity;
-    int barTime;
-    int noteTime;
-    boolean works;
-    private int startTime, barCount = 0, barIndex = 1;
+    private Context context;
+    private LinearLayout tabLayout;
+    private MainActivity mainActivity;
+    private int barTime = (int) Math.round(60000000.0 / 120.0);
+    private int noteTime;
+    private boolean works, pause;
+    private int startTime, barCount = 0, barIndex = 1, bpm = 120;
     private double eps;
     private Thread barThread;
 
 
-    ArrayList<Note> temp = new ArrayList<>();
+    private ArrayList<Note> temp = new ArrayList<>();
+    private ArrayList<ArrayList<String>> stringsList = new ArrayList<>();
 
-    String strings[] = {"E", "B", "G", "D", "A", "E"};
+    private String strings[] = {"E", "B", "G", "D", "A", "E", ""};
 
+
+    Tablature() {  //empty constructor
+    }
 
     Tablature(Context context) {
         this.context = context;
@@ -55,6 +60,10 @@ public class Tablature {
             }
         });
 
+        for (int i = 0; i < 7; i++) {
+            stringsList.add(new ArrayList<>());
+            stringsList.get(i).add(strings[i]);
+        }
 
         barThread = new Thread(new BarThread());
         initializeTab();
@@ -75,54 +84,72 @@ public class Tablature {
         tabLayout.addView(layout);
     }
 
+    public boolean isPaused() {
+        return pause;
+    }
+
+
+    @SuppressWarnings("SynchronizeOnNonFinalField")
     public void startRecord() {
+        // TODO: 05.02.16 не работает старт потока, исправить!
         try {
+            pause = false;
+            works = true;
             barThread.start();
         } catch (Exception e) {
-            works = true;
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @param pause true, чтобы приостановить запись таба
+     *              с возможностью продолжения, false,
+     *              для подготовки таба к сохранению.
+     */
+    private void stopRecord(boolean pause) {
+        this.pause = pause;
+        if (!pause) {
+            works = false;
         }
     }
 
     public void stopRecord() {
-        works = false;
+        stopRecord(false);
     }
 
-    public void addNote(int stringNumber, int fret) {
-        tabLayout.addView(new Bar(context).setNote(new Note(stringNumber, fret)));
+    public void pauseRecord() {
+        stopRecord(true);
     }
 
-    public void addNote(String note) {
+    public void addNote(int string, int fret) {
         noteTime = (int) (System.currentTimeMillis() - startTime);
-        if (!note.equals("")) {
-            if (barTime - noteTime > eps) {
-                tabLayout.addView(new Bar(context).setNote(new Note(Integer.valueOf(note.substring(0, 1))
-                                , Integer.valueOf(note.substring(2))))
-                );
-            } else {
-                temp.add(new Note(Integer.valueOf(note.substring(0, 1))
-                        , Integer.valueOf(note.substring(2))));
-            }
+        if (barTime - noteTime > eps) {
+            mainActivity.runOnUiThread(() -> tabLayout.addView(new Bar(context).setNote(new Note(string, fret))));
+        } else {
+            temp.add(new Note(string, fret));
         }
     }
 
+    public void addNote(String note) {
+        if (note.length() > 2) {
+            addNote(Integer.valueOf(note.substring(0, 1)),
+                    Integer.valueOf(note.substring(2)));
+        }
+    }
 
-    public void setTempo(int bpm) {
+    public void setBPM(int bpm) {
+        this.bpm = bpm;
         barTime = (int) Math.round(60000000.0 / bpm);
         eps = barTime / 16;
     }
 
-    public int getTempo() {
-        return barTime;
-    }
-
-    void addBeat(Note note) {
+    private void addBeat(Note note) {
         mainActivity.runOnUiThread(() -> {
             tabLayout.addView(new Bar(context).setNote(note));
         });
-
     }
 
-    void addBar() {
+    private void addBar() {
         barIndex = barCount++;
         mainActivity.runOnUiThread(() -> {
             tabLayout.addView(new Bar(context));
@@ -131,59 +158,110 @@ public class Tablature {
     }
 
     public Spinner getBpmSetter() {
-        Spinner spinner = new Spinner(context);
-        ArrayList<Integer> list = new ArrayList<>();
-        for (int i = 60; i < 300; i++) {
-            list.add(i);
+        if (bpmSetter != null) {
+            return bpmSetter;
+        } else {
+            bpmSetter = new Spinner(context);
+            ArrayList<Integer> list = new ArrayList<>();
+            for (int i = 60; i < 300; i++) {
+                list.add(i);
+            }
+
+            bpmSetter.setAdapter(new ArrayAdapter<>(context,
+                    android.R.layout.simple_spinner_item, list));
+
+            bpmSetter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    setBPM(position + 60);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    setBPM(120);
+                    Toast.makeText(context, mainActivity.getString(R.string.choosen_defaul_bpm),
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+            bpmSetter.setSelection(60); // 120bpm по-умолчанию
+            return bpmSetter;
         }
-
-        spinner.setAdapter(new ArrayAdapter<>(context,
-                android.R.layout.simple_spinner_item, list));
-
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                setTempo(position + 60);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                setTempo(120);
-                Toast.makeText(context, mainActivity.getString(R.string.choosen_defaul_bpm),
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
-        return spinner;
     }
 
+
+    /**
+     * Возвращает количество тактов
+     */
     public int getBarCount() {
         return barCount;
     }
 
-    class BarThread implements Runnable {
+    public void loadTabulature(Tablature tab) {
+        barCount = 0;
+        barIndex = 0;
+        this.bpm = tab.getBPM();
+        this.stringsList = tab.getStringsList();
+
+        String s = mainActivity.getString(R.string.fret_default);
+        for (int i = 1; i < stringsList.get(0).size(); i++) {
+            if (stringsList.get(0).get(i).equals(mainActivity.getString(R.string.new_bar))) {
+                addBar();
+            } else {
+                for (int j = 0; j < 7; j++) {
+                    if (stringsList.get(j).get(i).equals(s)) {
+                        tabLayout.addView(new Bar(context).setNote(new Note(j,
+                                        Integer.valueOf(stringsList.get(j).get(i))))
+                        );
+                    }
+                }
+            }
+
+        }
+    }
+
+    public int getBPM() {
+        return bpm;
+    }
+
+    public ArrayList<ArrayList<String>> getStringsList() {
+        return stringsList;
+    }
+
+    private class BarThread implements Runnable {
 
         @Override
         public void run() {
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
             works = true;
             while (works) {
-                startTime = (int) System.currentTimeMillis();
-                for (int i = 0; i < temp.size(); i++) {
-                    addBeat(temp.get(i));
+                if (pause) {
+                    while (pause) {
+                        try {
+                            Thread.sleep(100);
+//                                Log.i("BarThread","Sleeping");
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else {
+                    startTime = (int) System.currentTimeMillis();
+                    for (int i = 0; i < temp.size(); i++) {
+                        addBeat(temp.get(i));
+                    }
+
+                    addBar();
+
+                    try {
+                        Thread.sleep(barTime / 1000/*, barTime % 1000*/);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-
-                addBar();
-
-
-                try {
-                    Thread.sleep(barTime / 1000, barTime % 1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
             }
+            }
+
         }
-    }
+
 
     private class Bar extends LinearLayout {
 
@@ -192,32 +270,26 @@ public class Tablature {
         public Bar(Context context) {
             super(context);
             this.setOrientation(LinearLayout.VERTICAL);
-
-            for (int i = 0; i < 6; i++) {
-                TextView txt = new TextView(context);
-                txt.setLayoutParams(new LinearLayout.LayoutParams(
-                        30,
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        1));
-                txt.setText(context.getString(R.string.fret_default));
-                this.addView(txt);
-            }
+            setLayout(6, mainActivity.getString(R.string.fret_default), 30);
         }
 
         public Bar(Context context, int resId) {
             super(context);
             this.setOrientation(LinearLayout.VERTICAL);
+            setLayout(7, mainActivity.getString(resId), 20);
+        }
 
-            for (int i = 0; i < 7; i++) {
+        private void setLayout(int maxIndex, String text, int width) {
+            for (int i = 0; i < maxIndex; i++) {
                 TextView txt = new TextView(context);
                 txt.setLayoutParams(new LinearLayout.LayoutParams(
-                        20,
+                        width,
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         1));
-                txt.setText(context.getString(resId));
+                txt.setText(text);
                 this.addView(txt);
+                stringsList.get(i).add(text);
             }
-
         }
 
         public Note getNote() {
@@ -227,14 +299,15 @@ public class Tablature {
         public LinearLayout setNote(Note note) {
             this.note = note;
             ((TextView) this.getChildAt(note.getString() - 1)).setText(String.valueOf(note.getFret()));
+            stringsList.get(note.getString() - 1).add(String.valueOf(note.getFret()));
             return this;
         }
 
         public LinearLayout setBarNumber(int barNumber) {
             ((TextView) this.getChildAt(6)).setText(String.valueOf(barNumber));
+            stringsList.get(6).add(String.valueOf(barNumber));
             return this;
         }
-
     }
 
 
@@ -255,5 +328,4 @@ public class Tablature {
             return fret;
         }
     }
-
 }
