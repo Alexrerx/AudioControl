@@ -1,7 +1,6 @@
 package com.rerx.alexey.audiocontrol;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -13,6 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * l
@@ -38,6 +39,7 @@ public class Tablature {
     private ArrayList<ArrayList<String>> stringsList = new ArrayList<>();
 
     private String strings[] = {"E", "B", "G", "D", "A", "E", ""};
+    private LinkedHashMap<Integer, Integer> currentPitch = new LinkedHashMap<>();
 
 
     Tablature() {  //empty constructor
@@ -67,6 +69,7 @@ public class Tablature {
 
         barThread = new Thread(new BarThread());
         initializeTab();
+        setDefaultPitch();
     }
 
     private void initializeTab() {
@@ -79,6 +82,7 @@ public class Tablature {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     1));
             txt.setText(strings[i]);
+            txt.setTextSize(16);
             layout.addView(txt);
         }
         tabLayout.addView(layout);
@@ -88,6 +92,14 @@ public class Tablature {
         return pause;
     }
 
+    private void setDefaultPitch() {
+        // TODO: 06.02.16 Продумать тему с разными строями
+        for (int i = 1; i < 7; i++) {
+            currentPitch.put(i, 5);
+        }
+        currentPitch.put(3, 4);
+
+    }
 
     @SuppressWarnings("SynchronizeOnNonFinalField")
     public void startRecord() {
@@ -202,7 +214,7 @@ public class Tablature {
         this.bpm = tab.getBPM();
         this.stringsList = tab.getStringsList();
 
-        String s = mainActivity.getString(R.string.fret_default);
+        String s = mainActivity.getString(R.string.empty_note);
         for (int i = 1; i < stringsList.get(0).size(); i++) {
             if (stringsList.get(0).get(i).equals(mainActivity.getString(R.string.new_bar))) {
                 addBar();
@@ -258,19 +270,27 @@ public class Tablature {
                     }
                 }
             }
-            }
-
         }
+
+    }
 
 
     private class Bar extends LinearLayout {
 
         private Note note;
+        private int changingNoteColor = mainActivity.getResources()
+                .getColor(R.color.changing_note),
+                alternativeNoteColor = mainActivity.getResources()
+                        .getColor(R.color.alternative_note),
+                emptyNoteColor = mainActivity.getResources()
+                        .getColor(R.color.empty_note);
+        private String emptyNote = mainActivity.getString(R.string.empty_note);
+
 
         public Bar(Context context) {
             super(context);
             this.setOrientation(LinearLayout.VERTICAL);
-            setLayout(6, mainActivity.getString(R.string.fret_default), 30);
+            setLayout(6, emptyNote, 30);
         }
 
         public Bar(Context context, int resId) {
@@ -279,17 +299,20 @@ public class Tablature {
             setLayout(7, mainActivity.getString(resId), 20);
         }
 
-        private void setLayout(int maxIndex, String text, int width) {
+        private LinearLayout setLayout(int maxIndex, String text, int width) {
             for (int i = 0; i < maxIndex; i++) {
                 TextView txt = new TextView(context);
                 txt.setLayoutParams(new LinearLayout.LayoutParams(
                         width,
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         1));
+                txt.setTextSize(16);
+                txt.setGravity(TEXT_ALIGNMENT_CENTER);
                 txt.setText(text);
                 this.addView(txt);
                 stringsList.get(i).add(text);
             }
+            return this;
         }
 
         public Note getNote() {
@@ -298,10 +321,50 @@ public class Tablature {
 
         public LinearLayout setNote(Note note) {
             this.note = note;
-            ((TextView) this.getChildAt(note.getString() - 1)).setText(String.valueOf(note.getFret()));
+            TextView textView = ((TextView) this.getChildAt(note.getString() - 1));
+            textView.setText(String.valueOf(note.getFret()));
+            if (note.doAlternativeNotesExist()) {
+                textView.setBackgroundColor(changingNoteColor);
+                textView.setOnClickListener(v -> {
+                    if (v.getTag(this.getId()) == "changing") {
+                        removeAlternativeNotes(note.getString());
+                        v.setBackgroundColor(emptyNoteColor);
+                    } else {
+                        setAlternativeNotes(note.getAlternativeNotes(note.getString(), note.getFret()), note.getString());
+                        v.setTag(this.getId(), "changing");
+                        v.setBackgroundColor(changingNoteColor);
+                    }
+                });
+            }
+
             stringsList.get(note.getString() - 1).add(String.valueOf(note.getFret()));
             return this;
         }
+
+        void setAlternativeNotes(HashMap<Integer, Integer> map, int startSting) {
+            for (int i = startSting; i < map.size() + 1; i++) {
+                if (i != note.getString()) {
+                    TextView text = ((TextView) this.getChildAt(i - 1));
+                    text.setText(String.valueOf(map.get(i)));
+                    text.setTag(text.getId(), new Note(i, map.get(i)));
+                    text.setBackgroundColor(alternativeNoteColor);
+                    text.setOnClickListener(v -> {
+                        this.removeAllViews();
+                        ((Bar) this.setLayout(6, emptyNote, 30)).setNote((Note) v.getTag(v.getId()));
+                    });
+                }
+            }
+        }
+
+        void removeAlternativeNotes(int startSting) {
+            for (int i = startSting; i < 6; i++) {
+                TextView text = ((TextView) this.getChildAt(i));
+                text.setText(emptyNote);
+                text.setBackgroundColor(emptyNoteColor);
+                text.setOnClickListener(null);
+            }
+        }
+
 
         public LinearLayout setBarNumber(int barNumber) {
             ((TextView) this.getChildAt(6)).setText(String.valueOf(barNumber));
@@ -312,8 +375,8 @@ public class Tablature {
 
 
     private class Note {
-        private int string; //Струна
-        private int fret; //Лад
+        private int string; //Струна, с 1 по 6
+        private int fret; //Лад, с 0 по 20
 
         Note(int string, int fret) {
             this.string = string;
@@ -327,5 +390,45 @@ public class Tablature {
         public int getFret() {
             return fret;
         }
+
+        public HashMap<Integer, Integer> getAlternativeNotes(int string, int fret) {
+            HashMap<Integer, Integer> map = new HashMap<>();
+
+            if (fret < currentPitch.get(string)) {
+                int newfret = fret;
+                map.put(string, newfret);
+                for (int i = string + 1; i < 7; i++) {
+                    newfret += currentPitch.get(i);
+                    if (newfret < 20) {
+                        map.put(i, newfret);
+                    } else {
+                        break;
+                    }
+                }
+            } else {
+                Note note = getBasicNote();
+                map = getAlternativeNotes(note.getString(), note.getFret());
+            }
+            return map;
+        }
+
+        private Note getBasicNote() {
+            int newstring = this.getString(), newfret = this.getFret();
+
+            while (newfret >= currentPitch.get(newstring)) {
+                newfret -= currentPitch.get(newstring--);
+            }
+            return new Note(newstring, newfret);
+        }
+
+        public boolean doAlternativeNotesExist() {
+            return !((string == 1) && (fret > 15) || (string == 6) && (fret < 5));
+        }
+
+//        public Spinner getAlternativeNotesChooser(){
+//            Spinner spinner = new Spinner(context);
+//            spinner.setAdapter(new ArrayAdapter<In>());
+//        }
+
     }
 }

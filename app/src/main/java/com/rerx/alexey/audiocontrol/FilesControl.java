@@ -65,14 +65,14 @@ public class FilesControl {
         } else {
             PrintWriter writer = new PrintWriter(file);
 
-            for (int i = 0; i < tab.getStringsList().size(); i++) {
+            for (int i = 0; i < 6; i++) {
                 String storedData = "";
                 for (String s : tab.getStringsList().get(i)) {
                     storedData = storedData.concat(s);
                 }
                 writer.println(storedData);
             }
-
+            writer.close();
 
         }
         return true;

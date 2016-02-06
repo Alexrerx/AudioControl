@@ -556,7 +556,7 @@ public class MainActivity extends FragmentActivity {
 
                         final String finalFreq = String.valueOf(freq);
 
-                        runOnUiThread(() -> textView.setText(finalFreq));
+//                        runOnUiThread(() -> textView.setText(finalFreq));
 
                         determineNotes_old(freq);
                         tab.addNote(note);
