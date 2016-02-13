@@ -98,6 +98,16 @@ public class FilesControl {
         }
     }
 
+    public void saveFile(String name, ArrayList<Object> list) throws FileNotFoundException {
+        File file = new File(PATH + name);
+        PrintWriter writer = new PrintWriter(file);
+        for (Object s : list) {
+            writer.println(s);
+        }
+        writer.close();
+
+    }
+
 
     public BufferedReader openFile(BufferedReader br, String fileName) throws FileNotFoundException {
         br = new BufferedReader(new FileReader(PATH + fileName));

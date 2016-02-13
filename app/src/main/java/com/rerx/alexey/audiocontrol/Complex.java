@@ -157,7 +157,16 @@ public double absOne(Complex a){
     }
     public Complex[] realToComplex(short arr[]){
         Complex[] complex = new Complex[arr.length];
-        for (int i = 0;i<arr.length;i++){
+
+        int first_block = arr.length / 2;
+        int second_block = arr.length;
+        new Thread(() -> {
+            for (int i = first_block; i < second_block; i++) {
+                complex[i] = new Complex(arr[i], 0);
+            }
+        }).start();
+
+        for (int i = 0; i < first_block; i++) {
             complex[i] = new Complex(arr[i],0);
         }
         return complex;

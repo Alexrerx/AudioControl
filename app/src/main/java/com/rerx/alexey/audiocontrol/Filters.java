@@ -53,6 +53,17 @@ public class Filters {
         double binToFrequancy = sampleRate / frameSize;
         LinkedHashMap<Integer, Integer> dictionary = new LinkedHashMap<>();//new Dictionary
 
+//        new Thread(() -> {
+//            for (int bin = frameSize/2; bin < frameSize; bin++) {
+//                double omegaExpected = DoublePi * (bin * binToFrequancy); // ω=2πf
+//                double omegaActual = (spectrum1[bin].phase() - spectrum0[bin].phase()) / shiftTime; // ω=∂φ/∂t
+//                double omegaDelta = Align(omegaActual - omegaExpected, DoublePi); // Δω=(∂ω + π)%2π - π
+//                double binDelta = omegaDelta / (DoublePi * binToFrequancy);
+//                double frequancyActual = (bin + binDelta) * binToFrequancy;
+//                double magnitude = spectrum1[bin].abs() + spectrum0[bin].abs();
+//                dictionary.put((int) Math.round(frequancyActual), (int) Math.round(magnitude * (0.5 + Math.abs(binDelta))));
+//            }
+//        }).start();
         for (int bin = 0; bin < frameSize; bin++) {
             double omegaExpected = DoublePi * (bin * binToFrequancy); // ω=2πf
             double omegaActual = (spectrum1[bin].phase() - spectrum0[bin].phase()) / shiftTime; // ω=∂φ/∂t

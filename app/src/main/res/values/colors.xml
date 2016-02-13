@@ -11,4 +11,6 @@
     <color name="alternative_note">#cf72ce57</color>
     <color name="changing_note">#ded43638</color>
     <color name="empty_note">#00ffffff</color>
+    <color name="determined_note">#cc2424</color>
+    <color name="black">#000000</color>
 </resources>

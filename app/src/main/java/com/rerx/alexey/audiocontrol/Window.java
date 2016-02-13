@@ -4,7 +4,7 @@ package com.rerx.alexey.audiocontrol;
  * Created by alexey on 08.01.16.
  */
 public class Window {
-    private final static double Q = 0.5;//стырено
+    private final static double Q = 0.7;//стырено
     //Здесь разные окна,какое применять-решим потом
 
     public double Rectangle(double n, double frameSize) {

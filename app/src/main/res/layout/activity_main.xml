@@ -10,10 +10,11 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="9">
+        android:layout_weight="9"
+        android:id="@+id/layout_top">
         <Button
             android:id="@+id/button_start_record"
-            android:layout_weight="2"
+            android:layout_weight="3"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:onClick="onRecorsStartClick"
@@ -24,27 +25,41 @@
             android:enabled="false"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="2"
+            android:layout_weight="3"
             android:onClick="onRecordStopClick"
             android:text="@string/stop_record">
         </Button>
 
-        <TextView
+        <ImageView
+            android:id="@+id/text_note"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:background="@color/empty_note"/>
+
+        <!--<SurfaceView
             android:layout_weight="2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:layout_gravity="center_horizontal|center_vertical"
-            android:id="@+id/a110" />
-        <TextView
-            android:layout_weight="2"
-            android:textColor="#cc2424"
-            android:textSize="20sp"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:id="@+id/note"
-            android:layout_gravity="end"/>
+            android:name="layout.FreqAndNoteFragment"
+            tools:layout="@layout/fragment_freq_and_note"
+            android:id="@+id/freq_note_fragment"/>-->
+        <!--        <TextView
+                    android:layout_weight="2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:id="@+id/a110" />
+                <TextView
+                    android:layout_weight="2"
+                    android:textColor="#cc2424"
+                    android:textSize="20sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:id="@+id/note"
+                    android:layout_gravity="end"/>-->
     </LinearLayout>
 
     <HorizontalScrollView android:id="@+id/amplitudeSCrollTOP"
