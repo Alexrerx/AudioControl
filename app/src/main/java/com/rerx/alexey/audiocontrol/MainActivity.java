@@ -50,7 +50,7 @@ public class MainActivity extends FragmentActivity {
     ImageView iview;
     Texts texts;
     Context context;
-    short myBufferSize = 1024;
+    short myBufferSize = 4096;
     int amplitudeColor;
     int maxAmplitudeColor;
     int maxAmplitudeIndex = 0;
@@ -298,16 +298,15 @@ public class MainActivity extends FragmentActivity {
     }
 
     private String[] setNotes() {
-        String[] s = {};
+        String[] s = new String[50];
         int count = 0;
-        for (int i = 0; i < 6; i++) {
-            if (i == 4) {
+        for (int i =6 ; i > 0; i--) {
+            if (i == 2) {
                 for (int j = 0; j < 4; j++) {
                     s[count++] = String.valueOf(i) + "-" + String.valueOf(j);
                 }
-            }
-            if (i == 1) {
-                for (int j = 0; j < 20; j++) {
+            }else if (i == 1) {
+                for (int j = 0; j < 21; j++) {
                     s[count++] = String.valueOf(i) + "-" + String.valueOf(j);
                 }
             } else {
@@ -577,8 +576,9 @@ public class MainActivity extends FragmentActivity {
             readCount = audioRecord.read(myBuffer, 0, myBufferSize);
             totalCount += readCount;
             for (int i = 0; i < myBuffer.length; i++) {
-                myBuffer[i] *= window.Gausse(i, myBufferSize);
-                myBuffer[i] *= sensivityRatio;
+                myBuffer[i] *= window.Gausse(myBuffer[i], myBufferSize);
+                myBuffer[i] *= window.Hamming(myBuffer[i], myBufferSize);
+                //myBuffer[i] *= sensivityRatio;
             }
 
             frame0 = complex.realToComplex(myBuffer);
@@ -603,8 +603,9 @@ public class MainActivity extends FragmentActivity {
 //                    }
 //                }).start();
                 for (int i = 0; i < myBuffer.length; i++) {
-                    myBuffer[i] *= window.Gausse(i, myBufferSize);
-                    myBuffer[i] *= sensivityRatio;
+                    myBuffer[i] *= window.Gausse(myBuffer[i], myBufferSize);
+                    myBuffer[i] *= window.Hamming(myBuffer[i], myBufferSize);
+                   // myBuffer[i] *= sensivityRatio;
                 }
 //                   setAFC(myBuffer);
                 //setAFC(getMaxByfferArray(myBuffer));
@@ -650,7 +651,7 @@ public class MainActivity extends FragmentActivity {
                         runOnUiThread(() -> textView.setText(finalFreq));
 //                        ((Texts)iview.getDrawable()).printFreq(String.valueOf(freq));
 //                        texts.setFreq(String.valueOf(freq));
-                        determineNotes_old(freq);
+                        determineNotes(freq);
                         tab.addNote(note);
 //                        texts.setNote(note);
                     }
@@ -693,7 +694,8 @@ public class MainActivity extends FragmentActivity {
     public int getFrequence(LinkedHashMap<Integer, Integer> map) {
         double f = 0;
         f = getMaxIndex(map.values().toArray()) * sampleRate / map.size();
-        return (int) Math.round(f);
+//        return (int) Math.round(f);
+        return (int) f;
     }
 
 
@@ -885,9 +887,9 @@ public class MainActivity extends FragmentActivity {
             note = "";
             return;
         }
-        ((Texts) iview.getDrawable()).printNote(String.valueOf(s));
+//        ((Texts) iview.getDrawable()).printNote(String.valueOf(s));
 //        texts.printNote(s);
-//        runOnUiThread(() -> noteText.setText(note));
+        runOnUiThread(() -> noteText.setText(note));
 
     }
 

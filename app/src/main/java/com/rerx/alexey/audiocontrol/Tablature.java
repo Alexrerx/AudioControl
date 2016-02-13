@@ -1,6 +1,7 @@
 package com.rerx.alexey.audiocontrol;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -321,6 +322,7 @@ public class Tablature {
 
         public LinearLayout setNote(Note note) {
             this.note = note;
+            Log.d("Tab",note.toString());
             TextView textView = ((TextView) this.getChildAt(note.getString() - 1));
             textView.setText(String.valueOf(note.getFret()));
             if (note.doAlternativeNotesExist()) {
@@ -389,6 +391,11 @@ public class Tablature {
 
         public int getFret() {
             return fret;
+        }
+
+        @Override
+        public String toString() {
+            return String.valueOf(string)+"-"+String.valueOf(fret);
         }
 
         public HashMap<Integer, Integer> getAlternativeNotes(int string, int fret) {
