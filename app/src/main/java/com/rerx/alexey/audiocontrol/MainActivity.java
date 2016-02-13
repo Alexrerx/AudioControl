@@ -63,6 +63,7 @@ public class MainActivity extends FragmentActivity {
     public final short a110 = 110;
     public double basisDb = 0.0000000000001;
     String NOTES[] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+    String notesInTabs[] = {};
     public int sampleRate = 8000;
 
     Complex[] frame0, frame1, spec0, spec1;
@@ -112,9 +113,11 @@ public class MainActivity extends FragmentActivity {
         initializeAFC();
         setMaxAmplitudeColor();
 
-        initializeMap();
-        initializeMap_old();
+        notesInTabs = setNotes();
+//        initializeMap();
+//        initializeMap_old();
 //        testTab();
+        initializeMap_new();
     }
 
 //    void setTexts(Texts texts){
@@ -241,47 +244,112 @@ public class MainActivity extends FragmentActivity {
 
     private void initializeMap() {
 
-        notesMap.put(109, "5-0");
+        notesMap.put(84, "6-0");
+        notesMap.put(88, "6-1");
+        notesMap.put(92, "6-2");
+        notesMap.put(99, "6-3");
+        notesMap.put(104, "6-4");
+
+        notesMap.put(111, "5-0");
+        notesMap.put(115, "5-1");
+        notesMap.put(122, "5-2");
+        notesMap.put(132, "5-3");
+        notesMap.put(138, "5-4");
 
         notesMap.put(147, "4-0");
-        notesMap.put(154, "4-1");
+        notesMap.put(155, "4-1");
         notesMap.put(165, "4-2");
         notesMap.put(175, "4-3");
-        notesMap.put(183, "4-4");
+        notesMap.put(185, "4-4");
 
-        notesMap.put(194, "3-0");
-        notesMap.put(208, "3-1");
+        notesMap.put(196, "3-0");
+        notesMap.put(206, "3-1");
         notesMap.put(218, "3-2");
         notesMap.put(233, "3-3");
 
-        notesMap.put(247, "2-0");
-        notesMap.put(261, "2-1");
-        notesMap.put(279, "2-2");
-        notesMap.put(294, "2-3");
-        notesMap.put(312, "2-4");
+        notesMap.put(246, "2-0");
+        notesMap.put(260, "2-1");
+        notesMap.put(278, "2-2");
+        notesMap.put(295, "2-3");
+        notesMap.put(314, "2-4");
 
-        notesMap.put(332, "1-0");
-        notesMap.put(354, "1-1");
-        notesMap.put(369, "1-2");
-        notesMap.put(393, "1-3");
-        notesMap.put(420, "1-4");
+        notesMap.put(330, "1-0");
+        notesMap.put(352, "1-1");
+        notesMap.put(371, "1-2");
+        notesMap.put(394, "1-3");
+        notesMap.put(416, "1-4");
         notesMap.put(441, "1-5");
-        notesMap.put(453, "1-6");
-        notesMap.put(484, "1-7");
-        notesMap.put(415, "1-8");
-        notesMap.put(546, "1-9");
-        notesMap.put(578, "1-10");
-        notesMap.put(609, "1-11");
-        notesMap.put(656, "1-12");
-        notesMap.put(687, "1-13");
-        notesMap.put(734, "1-14");
-        notesMap.put(781, "1-15");
-        notesMap.put(828, "1-16");
-        notesMap.put(875, "1-17");
-        notesMap.put(921, "1-18");
-        notesMap.put(984, "1-19");
-        notesMap.put(1046, "1-20");
+        notesMap.put(466, "1-6");
+        notesMap.put(493, "1-7");
+        notesMap.put(520, "1-8");
+        notesMap.put(551, "1-9");
+        notesMap.put(580, "1-10");
+        notesMap.put(620, "1-11");
+        notesMap.put(655, "1-12");
+        notesMap.put(695, "1-13");
+        notesMap.put(735, "1-14");
+        notesMap.put(780, "1-15");
+        notesMap.put(830, "1-16");
+        notesMap.put(880, "1-17");
+        notesMap.put(934, "1-18");
+        notesMap.put(990, "1-19");
+        notesMap.put(1048, "1-20");
 
+    }
+
+    private String[] setNotes() {
+        String[] s = {};
+        int count = 0;
+        for (int i = 0; i < 6; i++) {
+            if (i == 4) {
+                for (int j = 0; j < 4; j++) {
+                    s[count++] = String.valueOf(i) + "-" + String.valueOf(j);
+                }
+            }
+            if (i == 1) {
+                for (int j = 0; j < 20; j++) {
+                    s[count++] = String.valueOf(i) + "-" + String.valueOf(j);
+                }
+            } else {
+                for (int j = 0; j < 5; j++) {
+                    s[count++] = String.valueOf(i) + "-" + String.valueOf(j);
+                }
+            }
+        }
+        return s;
+    }
+
+    private void initializeMap_new() {
+
+        int old = countFreq(-30);
+        int old_v = 70;
+
+        for (int i = -29; i < 16; i++) {
+            int delta = (countFreq(i) - old) / 2;
+            for (int j = -delta; j < delta + 1; j++) {
+                if (countFreq(i) + j != old_v) {
+                    notesMap.put(countFreq(i) + j, notesInTabs[i + 29]);
+                }
+            }
+            old_v = countFreq(i) + delta;
+            old = countFreq(i);
+        }
+        notesMap.put(142, notesInTabs[9]);
+        notesMap.put(285, notesInTabs[21]);
+        notesMap.put(320, notesInTabs[23]);
+        notesMap.put(539, notesInTabs[32]);
+        notesMap.put(571, notesInTabs[33]);
+        notesMap.put(605, notesInTabs[34]);
+        notesMap.put(641, notesInTabs[35]);
+        notesMap.put(679, notesInTabs[36]);
+        notesMap.put(762, notesInTabs[38]);
+        notesMap.put(808, notesInTabs[39]);
+        notesMap.put(856, notesInTabs[40]);
+        notesMap.put(961, notesInTabs[42]);
+    }
+
+    private int countFreq(int i) {
+        return (int) (441 * Math.pow(2, (((double) i) / 12)));
     }
 
     void createAudioRecorder() {
