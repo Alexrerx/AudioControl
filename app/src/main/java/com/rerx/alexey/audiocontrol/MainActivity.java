@@ -18,6 +18,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.FileNotFoundException;
@@ -32,7 +33,7 @@ import view.SlidingTabLayout;
 public class MainActivity extends FragmentActivity {
     FFT fft;
 
-    //    TextView textView, noteText;
+    TextView textView, noteText;
     Button startRecordBtn, stopRecordBtn;
 
 
@@ -93,15 +94,15 @@ public class MainActivity extends FragmentActivity {
         startRecordBtn = (Button) findViewById(R.id.button_start_record);
         stopRecordBtn = (Button) findViewById(R.id.button_stop_record);
 
-//        textView = (TextView) findViewById(R.id.a110);
-//        noteText = (TextView) findViewById(R.id.note);
+        textView = (TextView) findViewById(R.id.a110);
+        noteText = (TextView) findViewById(R.id.note);
         amplitudeLayoutTOP = (LinearLayout) findViewById(R.id.amplitudeLayoutTOP);
         amplitudeLayoutBOTTOM = (LinearLayout) findViewById(R.id.amplitudeLayoutBOTTOM);
 
         amplitudeScrollTOP = (HorizontalScrollView) findViewById(R.id.amplitudeSCrollTOP);
         amplitudeScrollBOTTOM = (HorizontalScrollView) findViewById(R.id.amplitudeSCrollBOTTOM);
 
-        iview = ((ImageView) findViewById(R.id.text_note));
+//        iview = ((ImageView) findViewById(R.id.text_note));
 //        texts = (Texts) iview.getDrawable();
 
 
@@ -577,11 +578,10 @@ public class MainActivity extends FragmentActivity {
                     freq = getFrequence(spectrumNew);
                     if ((freq > 60) && (freq < 1047)) {
 
-//                        runOnUiThread(() -> textView.setText(finalFreq));
+                        final String finalFreq = String.valueOf(freq);
+                        runOnUiThread(() -> textView.setText(finalFreq));
 //                        ((Texts)iview.getDrawable()).printFreq(String.valueOf(freq));
 //                        texts.setFreq(String.valueOf(freq));
-
-
                         determineNotes_old(freq);
                         tab.addNote(note);
 //                        texts.setNote(note);
@@ -833,7 +833,7 @@ public class MainActivity extends FragmentActivity {
         }
 //        ((Texts)iview.getDrawable()).printNote(String.valueOf(s));
 
-//        runOnUiThread(() -> noteText.setText(note));
+        runOnUiThread(() -> noteText.setText(note));
 
 
     }
