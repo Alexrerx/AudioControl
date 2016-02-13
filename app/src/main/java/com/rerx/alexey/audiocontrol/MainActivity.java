@@ -50,7 +50,7 @@ public class MainActivity extends FragmentActivity {
     ImageView iview;
     Texts texts;
     Context context;
-    short myBufferSize = 4096;
+    short myBufferSize = 1024;
     int amplitudeColor;
     int maxAmplitudeColor;
     int maxAmplitudeIndex = 0;
@@ -577,12 +577,13 @@ public class MainActivity extends FragmentActivity {
             totalCount += readCount;
             for (int i = 0; i < myBuffer.length; i++) {
                 myBuffer[i] *= window.Gausse(myBuffer[i], myBufferSize);
-                myBuffer[i] *= window.Hamming(myBuffer[i], myBufferSize);
+//                myBuffer[i] *= window.Hamming(myBuffer[i], myBufferSize);
                 //myBuffer[i] *= sensivityRatio;
             }
 
             frame0 = complex.realToComplex(myBuffer);
 //            myBufferOld = myBuffer;
+            this.spec0 = fftAnother.DecimationInTime(frame0, true);
 
             while (isReading) {
 
@@ -603,9 +604,9 @@ public class MainActivity extends FragmentActivity {
 //                    }
 //                }).start();
                 for (int i = 0; i < myBuffer.length; i++) {
-                    myBuffer[i] *= window.Gausse(myBuffer[i], myBufferSize);
-                    myBuffer[i] *= window.Hamming(myBuffer[i], myBufferSize);
-                   // myBuffer[i] *= sensivityRatio;
+                    myBuffer[i] *= window.Gausse(i, myBufferSize);
+//                    myBuffer[i] *= window.Hamming(myBuffer[i], myBufferSize);
+                    myBuffer[i] *= sensivityRatio;
                 }
 //                   setAFC(myBuffer);
                 //setAFC(getMaxByfferArray(myBuffer));
@@ -617,15 +618,17 @@ public class MainActivity extends FragmentActivity {
 
                 frame1 = complex.realToComplex(myBuffer);
 
-                spec0 = fftAnother.DecimationInTime(frame0, true);
+
 //                kuli0 = fftKuliTurky.Calculate(myBuffer);
 
 //                    spectrum1.toArray(spec1);
                 spec1 = fftAnother.DecimationInTime(frame1, true);
+//                spec0 = fftAnother.DecimationInTime(frame0, true);
+
 //                kuli1 = fftKuliTurky.Calculate(myBufferOld);
 
 //                myBufferOld = myBuffer;
-                frame0 = frame1;
+
 
 //                for (int r = 0; r < myBuffer.length; r++) {
 //                    spec0[r].abs /= myBuffer.length;
@@ -635,9 +638,15 @@ public class MainActivity extends FragmentActivity {
 //                    kuli1[r] /= myBuffer.length;
 //                    kuli0[r] /= myBuffer.length;
 //                }
-
                 final LinkedHashMap<Integer, Integer> spectrumNew = Filters.GetJoinedSpectrum(spec0, spec1, ShiftsPerFrame, sampleRate);
-//                double[] spectrumNew = kuli0;
+
+                frame0 = frame1;
+
+                new Thread(() -> {
+                    this.spec0 = fftAnother.DecimationInTime(frame0, true);
+                }).start();
+
+// double[] spectrumNew = kuli0;
 //                    setAFC((spectrumNew));  //Визуализация
 
 //                    LinkedHashMap<Double, Boolean> map = new LinkedHashMap<>();
