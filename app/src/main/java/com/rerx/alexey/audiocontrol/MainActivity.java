@@ -80,6 +80,7 @@ public class MainActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        realDPI = getResources().getDisplayMetrics().densityDpi;
 
         context = this;
 
@@ -117,7 +118,7 @@ public class MainActivity extends FragmentActivity {
 //        initializeMap_old();
 //        testTab();
         initializeMap_new();
-        realDPI = getResources().getDisplayMetrics().densityDpi;
+
     }
 
 //    void setTexts(Texts texts){
