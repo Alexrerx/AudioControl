@@ -6,6 +6,7 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,8 +18,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -29,7 +28,6 @@ public class MainActivity extends FragmentActivity {
 
     TextView textView, noteText;
     Button startRecordBtn, stopRecordBtn;
-
 
     FFTAnother fftAnother;
     Complex complex;
@@ -43,6 +41,7 @@ public class MainActivity extends FragmentActivity {
     LinearLayout amplitudeLayoutTOP, amplitudeLayoutBOTTOM, layoutTOP;
     HorizontalScrollView amplitudeScrollTOP, amplitudeScrollBOTTOM;
 
+    double realDPI, myDPI = 240.0;
     ImageView iview;
     Texts texts;
     Context context;
@@ -118,6 +117,7 @@ public class MainActivity extends FragmentActivity {
 //        initializeMap_old();
 //        testTab();
         initializeMap_new();
+        realDPI = getResources().getDisplayMetrics().densityDpi;
     }
 
 //    void setTexts(Texts texts){
@@ -410,6 +410,17 @@ public class MainActivity extends FragmentActivity {
         }
 
 
+    }
+
+    /**
+     * Расчитывает относительно значение в пикселях исходя из реальной плотности пикселей.
+     * Плотность на моем huawei = 240dpi, поэтому расчет ведется из отношения dpi устройства к dpi моего устройства.
+     * Иначе местами разметка кривая.
+     *
+     * @return pixels
+     */
+    int countSize(int pixels) {
+        return (int) (pixels * (realDPI / myDPI));
     }
 
     public void startRecord() {

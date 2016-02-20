@@ -30,43 +30,44 @@ public class UI {
     FilesControl filesControl;
     Tablature tab;
 
+    int smallHeight = 90, bigHeight = 200;
+
     UI(Context context) {
         this.context = context;
         mainActivity = (MainActivity) context;
         filesControl = mainActivity.filesControl;
         tab = mainActivity.tab;
+        setValues();
     }
 
-    void preparePager() {
-
+    void setValues() {
+        smallHeight = mainActivity.countSize(smallHeight);
+        bigHeight = mainActivity.countSize(bigHeight);
     }
 
-    void setStartAlertDialog() {
-        LinearLayout layout = new LinearLayout(context);
-        layout.setLayoutParams(new LinearLayout.LayoutParams(-2, -2));
-        layout.setOrientation(LinearLayout.VERTICAL);
 
+    ViewPager preparePager() {
         ViewPager pager = new ViewPager(context);
         pager.setAdapter(new myPager());
-        pager.setLayoutParams(new LinearLayout.LayoutParams(-1, 90));
+        pager.setLayoutParams(new LinearLayout.LayoutParams(-1, smallHeight));
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 //                if(position==1){
-//                    pager.setLayoutParams(new LinearLayout.LayoutParams(-1,  90+(int)(110*positionOffset)));
+//                    pager.setLayoutParams(new LinearLayout.LayoutParams(-1,  smallHeight+(int)((bigHeight-smallHeight)*positionOffset)));
 //                    Log.i("scroll",""+(90+(int)(110*positionOffset)));
 //                }else
 //                if(position==2){
-//                    (pager).setLayoutParams(new LinearLayout.LayoutParams(-1,  200-(int)(110*positionOffset)));
+//                    (pager).setLayoutParams(new LinearLayout.LayoutParams(-1,  bigHeight-(int)((bigHeight-smallHeight)*positionOffset)));
 //                }
             }
 
             @Override
             public void onPageSelected(int position) {
                 if (position == 2) {
-                    (pager).setLayoutParams(new LinearLayout.LayoutParams(-1, 200));
+                    (pager).setLayoutParams(new LinearLayout.LayoutParams(-1, bigHeight));
                 } else {
-                    (pager).setLayoutParams(new LinearLayout.LayoutParams(-1, 90));
+                    (pager).setLayoutParams(new LinearLayout.LayoutParams(-1, smallHeight));
                 }
 
             }
@@ -76,6 +77,16 @@ public class UI {
 
             }
         });
+        return pager;
+    }
+
+    void setStartAlertDialog() {
+        ViewPager pager = preparePager();
+        LinearLayout layout = new LinearLayout(context);
+        layout.setLayoutParams(new LinearLayout.LayoutParams(-2, -2));
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+
 
         SlidingTabLayout slidingTab = new SlidingTabLayout(context);
         slidingTab.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
