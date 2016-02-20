@@ -16,6 +16,9 @@
     <string name="exit">Выход</string>
     <string name="folder_not_found">Не найдена папка конфигураций</string>
     <string name="new_note">Новая нота</string>
+    <string name="visualization_switch">Включить визуализацию</string>
+    <string name="calibration_button">Калибровка</string>
+    <string name="buffer_size">Размер буфера</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

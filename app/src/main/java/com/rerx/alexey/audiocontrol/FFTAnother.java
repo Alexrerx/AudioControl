@@ -1,5 +1,7 @@
 package com.rerx.alexey.audiocontrol;
 
+import android.util.Log;
+
 /**
  * Created by alexey on 08.01.16.
  */
@@ -11,8 +13,10 @@ public class FFTAnother {
         public final double SinglePi = Math.PI;
         public static final double DoublePi = 2*Math.PI;
 
-    public Complex[] DecimationInTime(Complex[] frame, boolean direct)
-        {
+    Complex[] spectrumOdd_2;
+    boolean worked = false;
+
+    public Complex[] DecimationInTime(Complex[] frame, boolean direct, boolean first) {
             if (frame.length == 1) return frame;
             int frameHalfSize = frame.length >> 1; // frame.Length/2
             int frameFullSize = frame.length;
@@ -26,22 +30,49 @@ public class FFTAnother {
                 frameEven[i] = frame[j];
             }
 
-            Complex[] spectrumOdd = DecimationInTime(frameOdd, direct);
-            Complex[] spectrumEven = DecimationInTime(frameEven, direct);
+        Complex[] spectrumOdd = new Complex[0];
+
+        if (first) {
+            worked = false;
+            new Thread(() -> {
+                Log.i("fft", "thread_start");
+                spectrumOdd_2 = DecimationInTime(frameOdd, direct, false);
+                worked = true;
+                Log.i("fft", "thread_end");
+            }).start();
+        } else {
+            spectrumOdd = DecimationInTime(frameOdd, direct, false);
+        }
+        Complex[] spectrumEven = DecimationInTime(frameEven, direct, false);
 
             double arg = direct ? -DoublePi/frameFullSize : DoublePi/frameFullSize;
-//            Complex omegaPowBase = new Complex(Math.cos(arg)+Math.cos(2*arg)+Math.cos(4*arg)+Math.cos(8*arg)+Math.cos(10*arg), Math.sin(arg)+Math.sin(2*arg)+Math.sin(4*arg)+Math.cos(8 * arg)+Math.sin(10*arg));
             Complex omegaPowBase = new Complex(Math.cos(arg), Math.sin(arg));
-            Complex omega = new Complex(1.0,0.0);
             Complex[] spectrum = new Complex[frameFullSize];
 
+
+        Complex omega = new Complex(1.0, 0.0);
+        if (first) {
+            while (!worked) {
+                try {
+                    Thread.sleep(10);
+                    Log.i("FFT", "sleeping");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             for (int j = 0; j < frameHalfSize; j++)
             {
+                spectrum[j] = spectrumEven[j].plus(omega.times(spectrumOdd_2[j]));
+                spectrum[j + frameHalfSize] = spectrumEven[j].minus(omega.times(spectrumOdd_2[j]));
+                omega = omega.times(omegaPowBase);
+            }
+        } else {
+            for (int j = 0; j < frameHalfSize; j++) {
                 spectrum[j] = spectrumEven[j].plus(omega.times(spectrumOdd[j])) ;
                 spectrum[j + frameHalfSize] = spectrumEven[j].minus(omega.times(spectrumOdd[j])) ;
                 omega = omega.times(omegaPowBase);
             }
-
+        }
             return spectrum;
         }
 

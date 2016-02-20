@@ -275,7 +275,6 @@ public class Tablature {
 
     }
 
-
     private class Bar extends LinearLayout {
 
         private Note note;
@@ -325,7 +324,7 @@ public class Tablature {
             Log.d("Tab",note.toString());
             TextView textView = ((TextView) this.getChildAt(note.getString() - 1));
             textView.setText(String.valueOf(note.getFret()));
-            if (note.doAlternativeNotesExist()) {
+            if (note.AlternativeNotesExist()) {
                 textView.setBackgroundColor(changingNoteColor);
                 textView.setOnClickListener(v -> {
                     if (v.getTag(this.getId()) == "changing") {
@@ -376,7 +375,7 @@ public class Tablature {
     }
 
 
-    private class Note {
+    public class Note {
         private int string; //Струна, с 1 по 6
         private int fret; //Лад, с 0 по 20
 
@@ -428,7 +427,7 @@ public class Tablature {
             return new Note(newstring, newfret);
         }
 
-        public boolean doAlternativeNotesExist() {
+        public boolean AlternativeNotesExist() {
             return !((string == 1) && (fret > 15) || (string == 6) && (fret < 5));
         }
 

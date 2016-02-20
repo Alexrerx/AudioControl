@@ -78,8 +78,60 @@ public class FilesControl {
         return true;
     }
 
-    public Tablature openTab(String name) throws FileNotFoundException {
+    public Tablature openTab(String name) throws IOException {
+        name = PATH + name + TAB_EXTENSION;
         Tablature tab = new Tablature();
+//        File file   = new File(name);
+        BufferedReader reader = openFile(name);
+        boolean initializated = false;
+        ArrayList<ArrayList<Integer[]>> list = new ArrayList<>();
+        for (int string = 1; string <= 6; string++) {
+            String line = reader.readLine();
+//            while((line.charAt(j)!='\n')){
+//                if((line.charAt(j)==c)){
+//
+//                }
+//            }
+            String[] bar = line.split("|");
+
+            if (!initializated) {
+                initializated = true;
+                for (String aBar : bar) {
+                    list.add(new ArrayList<>());
+                }
+            }
+
+
+            int i = 1;
+            while (i < bar[0].length()) {
+                if (bar[0].charAt(i) != '-') {
+                    String num_s = "";
+                    while (bar[0].charAt(i) != '-') {
+                        num_s += bar[0].charAt(i++);
+                    }
+                    Integer note[] = {string, Integer.valueOf(num_s)};
+                    list.get(i).add(note);
+                }
+                i++;
+            }
+
+            for (int bar_i = 1; bar_i < bar.length; bar_i++) {
+                i = 0;
+                while (i < bar[bar_i].length()) {
+                    if (bar[bar_i].charAt(i) != '-') {
+                        String num_s = "";
+                        while (bar[bar_i].charAt(i) != '-') {
+                            num_s += bar[bar_i].charAt(i++);
+                        }
+                        tab.addNote(string, Integer.valueOf(num_s));
+                    }
+                    i++;
+                }
+            }
+        }
+
+
+
 
         return tab;
     }
@@ -109,8 +161,8 @@ public class FilesControl {
     }
 
 
-    public BufferedReader openFile(BufferedReader br, String fileName) throws FileNotFoundException {
-        br = new BufferedReader(new FileReader(PATH + fileName));
+    public BufferedReader openFile(String fileName) throws FileNotFoundException {
+        BufferedReader br = new BufferedReader(new FileReader(PATH + fileName));
         Log.i("FilesControl", "File{" + fileName + "} is loaded");
         return br;
     }

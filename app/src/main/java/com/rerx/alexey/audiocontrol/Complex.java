@@ -1,51 +1,52 @@
 package com.rerx.alexey.audiocontrol;
 
 import android.content.Context;
+import android.util.Log;
 
 /**
  * Created by alexey on 08.01.16.
  */
 public class Complex {
     /******************************************************************************
-     *  Compilation:  javac Complex.java
-     *  Execution:    java Complex
-     *
-     *  Data type for complex numbers.
-     *
-     *  The data type is "immutable" so once you create and initialize
-     *  a Complex object, you cannot change it. The "final" keyword
-     *  when declaring re and im enforces this rule, making it a
-     *  compile-time error to change the .re or .im fields after
-     *  they've been initialized.
-     *
-     *  % java Complex
-     *  a            = 5.0 + 6.0i
-     *  b            = -3.0 + 4.0i
-     *  Re(a)        = 5.0
-     *  Im(a)        = 6.0
-     *  b + a        = 2.0 + 10.0i
-     *  a - b        = 8.0 + 2.0i
-     *  a * b        = -39.0 + 2.0i
-     *  b * a        = -39.0 + 2.0i
-     *  a / b        = 0.36 - 1.52i
-     *  (a / b) * b  = 5.0 + 6.0i
-     *  conj(a)      = 5.0 - 6.0i
-     *  |a|          = 7.810249675906654
-     *  tan(a)       = -6.685231390246571E-6 + 1.0000103108981198i
-     *
+     * Compilation:  javac Complex.java
+     * Execution:    java Complex
+     * <p>
+     * Data type for complex numbers.
+     * <p>
+     * The data type is "immutable" so once you create and initialize
+     * a Complex object, you cannot change it. The "final" keyword
+     * when declaring re and im enforces this rule, making it a
+     * compile-time error to change the .re or .im fields after
+     * they've been initialized.
+     * <p>
+     * % java Complex
+     * a            = 5.0 + 6.0i
+     * b            = -3.0 + 4.0i
+     * Re(a)        = 5.0
+     * Im(a)        = 6.0
+     * b + a        = 2.0 + 10.0i
+     * a - b        = 8.0 + 2.0i
+     * a * b        = -39.0 + 2.0i
+     * b * a        = -39.0 + 2.0i
+     * a / b        = 0.36 - 1.52i
+     * (a / b) * b  = 5.0 + 6.0i
+     * conj(a)      = 5.0 - 6.0i
+     * |a|          = 7.810249675906654
+     * tan(a)       = -6.685231390246571E-6 + 1.0000103108981198i
      ******************************************************************************/
 
 
     public double re;   // the real part
     public double im;   // the imaginary part
-    public double abs = Math.sqrt(re*re+im*im);
+    public double abs = Math.sqrt(re * re + im * im);
 
     // create a new object with the given real and imaginary parts
     public Complex(double real, double imag) {
         re = real;
         im = imag;
     }
-    public Complex(){
+
+    public Complex() {
 
     }
 
@@ -61,9 +62,11 @@ public class Complex {
     public double abs() {
         return Math.hypot(re, im);
     }  // Math.sqrt(re*re + im*im)
-public double absOne(Complex a){
-    return Math.sqrt(a.re*a.re+a.im*a.im);
-}
+
+    public double absOne(Complex a) {
+        return Math.sqrt(a.re * a.re + a.im * a.im);
+    }
+
     public double phase() {
         return Math.atan2(im, re);
     }  // between -pi and pi
@@ -114,6 +117,7 @@ public double absOne(Complex a){
     public double re() {
         return re;
     }
+
     //мнимая часть комплексного числа
     public double im() {
         return im;
@@ -146,37 +150,52 @@ public double absOne(Complex a){
         return sin().divides(cos());
     }
 
-    public Complex ctg(){
+    public Complex ctg() {
 
         return cos().divides(sin());
     }
-    public Complex PoweredE()
-    {
+
+    public Complex PoweredE() {
         double e = Math.exp(re);
         return new Complex(e * Math.cos(im), e * Math.sin(im));
     }
-    public Complex[] realToComplex(short arr[]){
+
+    final Object b = "";
+    boolean worked = false;
+
+    public Complex[] realToComplex(short arr[]) {
         Complex[] complex = new Complex[arr.length];
 
-        int first_block = arr.length / 2;
+//        int first_block = arr.length / 3;
         int second_block = arr.length;
 //        new Thread(() -> {
-//            for (int i = first_block; i < second_block; i++) {
-//                complex[i] = new Complex(arr[i], 0);
-//            }
+//                worked = false;
+//                for (int i = 0; i < first_block; i++) {
+//                    complex[i] = new Complex(arr[i], 0);
+//                }
+//                worked = true;
 //        }).start();
 
         for (int i = 0; i < second_block; i++) {
-            complex[i] = new Complex(arr[i],0);
+            complex[i] = new Complex(arr[i], 0);
         }
+
+//        while(!worked){
+//            try {
+//                Thread.sleep(10);
+////                    Log.i("FFT","sleeping");
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
         return complex;
     }
 
-    public short[] complexToShort(Complex[]arr){
+    public short[] complexToShort(Complex[] arr) {
         short[] mas = new short[arr.length];
-        for (int i = 0;i<arr.length;i++) {
-                mas[i] = (short) Math.sqrt(arr[i].re * arr[i].re + arr[i].im * arr[i].im);
-            }
+        for (int i = 0; i < arr.length; i++) {
+            mas[i] = (short) Math.sqrt(arr[i].re * arr[i].re + arr[i].im * arr[i].im);
+        }
         return mas;
     }
 }

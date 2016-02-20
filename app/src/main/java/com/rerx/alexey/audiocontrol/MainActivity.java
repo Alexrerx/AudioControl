@@ -1,34 +1,28 @@
 package com.rerx.alexey.audiocontrol;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import view.SlidingTabLayout;
 
 public class MainActivity extends FragmentActivity {
     FFT fft;
@@ -42,6 +36,8 @@ public class MainActivity extends FragmentActivity {
     FFTKuli_Turky fftKuliTurky;
     Tablature tab;
     FilesControl filesControl;
+    UI ui;
+
     final String TAG = "myLogs";
     Window window;
     LinearLayout amplitudeLayoutTOP, amplitudeLayoutBOTTOM, layoutTOP;
@@ -55,9 +51,12 @@ public class MainActivity extends FragmentActivity {
     int maxAmplitudeColor;
     int maxAmplitudeIndex = 0;
     int barSize = 1;
+    int baseFreq = 441;
+    short spinnerSelection = 1;
     float sensivityRatio = (float) 0.065;
     AudioRecord audioRecord;
     public boolean isReading = false;
+    boolean isVisualized;
     int frequance;
     public final double frequenceA = 421.875;
     public final short a110 = 110;
@@ -88,6 +87,7 @@ public class MainActivity extends FragmentActivity {
         tab = new Tablature(context);
         filesControl = new FilesControl(context);
         texts = new Texts(context);
+        ui = new UI(context);
 
         amplitudeColor = getResources().getColor(R.color.amplitude);
         maxAmplitudeColor = getResources().getColor(R.color.maxAmplitude);
@@ -333,6 +333,8 @@ public class MainActivity extends FragmentActivity {
             old_v = countFreq(i) + delta;
             old = countFreq(i);
         }
+
+        //костыль! Работает, не трогай XD
         notesMap.put(142, notesInTabs[9]);
         notesMap.put(285, notesInTabs[21]);
         notesMap.put(320, notesInTabs[23]);
@@ -348,7 +350,7 @@ public class MainActivity extends FragmentActivity {
     }
 
     private int countFreq(int i) {
-        return (int) (441 * Math.pow(2, (((double) i) / 12)));
+        return (int) (baseFreq * Math.pow(2, (((double) i) / 12)));
     }
 
     void createAudioRecorder() {
@@ -367,134 +369,32 @@ public class MainActivity extends FragmentActivity {
                 sampleRate, channelConfig, audioFormat, internalBufferSize);
     }
 
-    void setStartAlertDialog() {
-        LinearLayout layout = new LinearLayout(context);
-        layout.setLayoutParams(new LinearLayout.LayoutParams(-2, -2));
-        layout.setOrientation(LinearLayout.VERTICAL);
-
-        ViewPager pager = new ViewPager(context);
-        pager.setLayoutParams(new LinearLayout.LayoutParams(-1, 90));
-        pager.setAdapter(new PagerAdapter() {
-
+    Spinner getBufferSizeChooser() {
+        Spinner spinner = new Spinner(context);
+        ArrayList<Integer> list = new ArrayList<>();
+        int size = 256;
+        for (int i = 0; i < 6; i++) {
+            list.add(size *= 2);
+        }
+        spinner.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, list));
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public int getCount() {
-                return 2;
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                myBufferSize = Short.valueOf(((TextView) view).getText().toString());
+                spinnerSelection = (short) position;
             }
 
             @Override
-            public boolean isViewFromObject(View view, Object object) {
-                return object == view;
-            }
-
-            @Override
-            public Object instantiateItem(ViewGroup container, int position) {
-
-                Spinner spinner = null;
-
-                if (position == 0) {
-                    spinner = tab.getBpmSetter();
-                    Log.i("instantItem", "[" + position + "] setted");
-                }
-                if (position == 1) {
-                    spinner = filesControl.getSavedTabsChooser();
-                    Log.i("instantItem", "[" + position + "] setted");
-                }
-
-                container.addView(spinner);
-                return spinner;
-            }
-
-            @Override
-            public CharSequence getPageTitle(int position) {
-                CharSequence sequence = "";
-                if (position == 0) {
-                    sequence = "Установите темп";
-                }
-                if (position == 1) {
-                    sequence = "Выберете файл";
-                }
-                return sequence;
+            public void onNothingSelected(AdapterView<?> parent) {
+//                myBufferSize=1024;
             }
         });
-
-        SlidingTabLayout slidingTab = new SlidingTabLayout(context);
-        slidingTab.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
-        slidingTab.setViewPager(pager);
-
-        layout.addView(slidingTab);
-        layout.addView(pager);
-
-
-        new AlertDialog.Builder(context)
-                .setCancelable(true)
-                .setNegativeButton(R.string.cancel, (dialog1, which1) -> dialog1.dismiss())
-//                .setOnCancelListener((view) -> {
-//                    tab.setBPM(120);
-//                    Toast.makeText(context, getString(R.string.choosen_defaul_bpm),
-//                            Toast.LENGTH_SHORT)
-//                            .show();
-//                    startRecord();
-//                })
-                .setView(layout)
-                .setPositiveButton(getString(R.string.ok), (dialog, which) -> {
-                    switch (pager.getCurrentItem()) {
-                        case 0: { //Создание новой композиции
-                            startRecord();
-                            break;
-                        }
-                        case 1: { //Загрузка сохраненного таба
-                            try {
-                                tab.loadTabulature(filesControl.openTab(
-                                                filesControl.getSavedTabsChooser()
-                                                        .getSelectedItem()
-                                                        .toString())
-                                );
-                            } catch (FileNotFoundException e) {
-                                e.printStackTrace();
-                            }
-                            break;
-                        }
-                    }
-
-                })
-                .create()
-                .show();
+        spinner.setSelection(spinnerSelection);
+        return spinner;
     }
 
-    void setStopAlertDialog() {
-        final EditText tabNameEdit = new EditText(context);
-        new AlertDialog.Builder(context)
-                .setTitle("Введите название шоу")
-                .setCancelable(false)
-                .setPositiveButton("Сохранить",
-                        (dialog, which) -> {
-                            //save
-                            boolean result;
-                            try {
-                                result = filesControl.saveTab(tabNameEdit.getText().toString(), tab);
-                            } catch (IOException e) {
-                                Toast.makeText(context,
-                                        getString(R.string.tab_saving_error),
-                                        Toast.LENGTH_SHORT)
-                                        .show();
-                                e.printStackTrace();
-                            }
-                            stopRecordBtn.setEnabled(false);
-                            dialog.dismiss();
-                        })
-                .setNegativeButton("Отмена",
-                        (dialog, which) -> dialog.dismiss())
-                .setView(tabNameEdit)
-                .create()
-                .show();
-
-        tabNameEdit.setText("Новый таб 1");
-    }
 
     public void onRecorsStartClick(View v) {
-
-//        ((Texts)iview.getDrawable()).printFreq("345345");
-
 
         stopRecordBtn.setEnabled(true);
 
@@ -505,7 +405,7 @@ public class MainActivity extends FragmentActivity {
                 pauseRecord();
             }
         } else {
-            setStartAlertDialog();
+            ui.setStartAlertDialog();
             startRecordBtn.setText(getString(R.string.pause_record));
         }
 
@@ -524,7 +424,7 @@ public class MainActivity extends FragmentActivity {
 
     public void onRecordStopClick(View v) {
         stopRecord();
-        setStopAlertDialog();
+        ui.setStopAlertDialog();
     }
 
     private void stopRecord() {
@@ -583,7 +483,7 @@ public class MainActivity extends FragmentActivity {
 
             frame0 = complex.realToComplex(myBuffer);
 //            myBufferOld = myBuffer;
-            this.spec0 = fftAnother.DecimationInTime(frame0, true);
+            this.spec0 = fftAnother.DecimationInTime(frame0, true, true);
 
             while (isReading) {
 
@@ -606,8 +506,9 @@ public class MainActivity extends FragmentActivity {
                 for (int i = 0; i < myBuffer.length; i++) {
                     myBuffer[i] *= window.Gausse(i, myBufferSize);
 //                    myBuffer[i] *= window.Hamming(myBuffer[i], myBufferSize);
-                    myBuffer[i] *= sensivityRatio;
+//                    myBuffer[i] *= sensivityRatio;
                 }
+                Log.i("complex", "1");
 //                   setAFC(myBuffer);
                 //setAFC(getMaxByfferArray(myBuffer));
                 //Complex[] spectrumComplex = fftAnother.DecimationInTime(complex.realToComplex(myBuffer), true);
@@ -622,7 +523,12 @@ public class MainActivity extends FragmentActivity {
 //                kuli0 = fftKuliTurky.Calculate(myBuffer);
 
 //                    spectrum1.toArray(spec1);
-                spec1 = fftAnother.DecimationInTime(frame1, true);
+                int time0 = (int) System.currentTimeMillis();
+                Log.i("fft", "1" + frame1.toString());
+                spec1 = fftAnother.DecimationInTime(frame1, true, false);
+
+                int time2 = (int) System.currentTimeMillis();
+                Log.d("time1", String.valueOf(time2 - time0));
 //                spec0 = fftAnother.DecimationInTime(frame0, true);
 
 //                kuli1 = fftKuliTurky.Calculate(myBufferOld);
@@ -638,17 +544,23 @@ public class MainActivity extends FragmentActivity {
 //                    kuli1[r] /= myBuffer.length;
 //                    kuli0[r] /= myBuffer.length;
 //                }
+                Log.i("filter", "1");
                 final LinkedHashMap<Integer, Integer> spectrumNew = Filters.GetJoinedSpectrum(spec0, spec1, ShiftsPerFrame, sampleRate);
 
-                frame0 = frame1;
+//                int time3 = (int) System.currentTimeMillis();
+//                Log.d("time2",String.valueOf(time3-time2));
 
+//                frame0 = frame1;
+                Log.i("fft", "2");
                 new Thread(() -> {
-                    this.spec0 = fftAnother.DecimationInTime(frame0, true);
+                    this.spec0 = fftAnother.DecimationInTime(frame1, true, false);
                 }).start();
 
-// double[] spectrumNew = kuli0;
-//                    setAFC((spectrumNew));  //Визуализация
+//               double[] spectrumNew = kuli0;
 
+                if (isVisualized) {
+                    setAFC((spectrumNew));  //Визуализация
+                }
 //                    LinkedHashMap<Double, Boolean> map = new LinkedHashMap<>();
 
 
@@ -666,6 +578,11 @@ public class MainActivity extends FragmentActivity {
                     }
 
                 }
+
+                int time4 = (int) System.currentTimeMillis();
+//                Log.d("time3",String.valueOf(time4-time3));
+                Log.d("time4", String.valueOf(time4 - time0));
+
             }
 
             //magnitudeTransform(spectrum);
@@ -916,475 +833,5 @@ public class MainActivity extends FragmentActivity {
 
 
     }
-
-
-//    void determineFreq(int freq) {
-//
-//
-//        if (freq == 328.125) {
-//            Log.e(TAG, "1st");
-//            note = "1-0";
-//        }
-//        if (freq == 343.75) {
-//            Log.e(TAG, "1-1");
-//            note = "1-1";
-//        }
-//        if (freq == 359.375) {
-//            Log.e(TAG, "1-2");
-//            note = "1-2";
-//        }
-//        if (freq == 390.625) {
-//            Log.e(TAG, "1-3");
-//            note = "1-3";
-//        }
-//        if (freq == 406.25) {
-//            Log.e(TAG, "1-4");
-//            note = "1-4";
-//        }
-//        if (freq == 437.5) {
-//            Log.e(TAG, "1-5");
-//            note = "1-5";
-//        }
-//        if (freq == 453.125) {
-//            Log.e(TAG, "1-6");
-//            note = "1-6";
-//        }
-//        if (freq == 484.375) {
-//            Log.e(TAG, "1-7");
-//            note = "1-7";
-//        }
-//        if (freq == 515.625) {
-//            Log.e(TAG, "1-8");
-//            note = "1-8";
-//        }
-//        if (freq == 546.875) {
-//            Log.e(TAG, "1-9");
-//            note = "1-9";
-//        }
-//        if (freq == 578.125) {
-//            Log.e(TAG, "1-10");
-//            note = "1-10";
-//        }
-//        if (freq == 609.375) {
-//            Log.e(TAG, "1-11");
-//            note = "1-11";
-//        }
-//        if (freq == 656.25) {
-//            Log.e(TAG, "1-12");
-//            note = "1-12";
-//        }
-//        if (freq == 687.5) {
-//            Log.e(TAG, "1-13");
-//            note = "1-13";
-//        }
-//        if (freq == 734.375) {
-//            Log.e(TAG, "1-14");
-//            note = "1-14";
-//        }
-//        if (freq == 781.25) {
-//            Log.e(TAG, "1-15");
-//            note = "1-15";
-//        }
-//        if (freq == 828.125) {
-//            Log.e(TAG, "1-16");
-//            note = "1-16";
-//        }
-//        if (freq == 875) {
-//            Log.e(TAG, "1-17");
-//            note = "1-17";
-//        }
-//        if (freq == 921.875) {
-//            Log.e(TAG, "1-18");
-//            note = "1-18";
-//        }
-//        if (freq == 984.375) {
-//            Log.e(TAG, "1-19");
-//            note = "1-19";
-//        }
-//        if (freq == 1046.875) {
-//            Log.e(TAG, "1-20");
-//            note = "1-20";
-//        }
-////                        if (freq == ) {
-////                            Log.e(TAG, "1-21");
-////                            note = "1-21";
-////                        }
-//
-//        /**********2nd********************/
-//        if (freq == 250) {
-//            Log.e(TAG, "2nd");
-//            note = "2-0";
-//        }
-//
-//        if (freq == 265.625) {
-//            Log.e(TAG, "2-1");
-//            note = "2-1";
-//        }
-//        if (freq == 281.25) {
-//            Log.e(TAG, "2-2");
-//            note = "2-2";
-//        }
-//        if (freq == 296.875) {
-//            Log.e(TAG, "2-3");
-//            note = "2-3";
-//        }
-//        if (freq == 312.5) {
-//            Log.e(TAG, "2-4");
-//            note = "2-4";
-//        }
-////                        if (freq == 328.125) {
-////                            Log.e(TAG, "2-5");
-////                            note = "2-5";
-////                        }
-////                        if (freq == 343.75) {
-////                            Log.e(TAG, "2-6");
-////                            note = "2-6";
-////                        }
-////                        if (freq == 375.0) {
-////                            Log.e(TAG, "2-7");
-////                            note = "2-7";
-////                        }
-////                        if (freq == 390.625) {
-////                            Log.e(TAG, "2-8");
-////                            note = "2-8";
-////                        }
-////                        if (freq == 406.25) {
-////                            Log.e(TAG, "2-9");
-////                            note = "2-9";
-////                        }
-////                        if (freq == 437.5) {
-////                            Log.e(TAG, "2-10");
-////                            note = "2-10";
-////                        }
-////                        if (freq == 468.75) {
-////                            Log.e(TAG, "2-11");
-////                            note = "2-11";
-////                        }
-////                        if (freq == 484.375) {
-////                            Log.e(TAG, "2-12");
-////                            note = "2-12";
-////                        }
-////                        if (freq == 515.625) {
-////                            Log.e(TAG, "2-13");
-////                            note = "2-13";
-////                        }
-////                        if (freq == 546.875) {
-////                            Log.e(TAG, "2-14");
-////                            note = "2-14";
-////                        }
-////                        if (freq == 578.125) {
-////                            Log.e(TAG, "2-15");
-////                            note = "2-15";
-////                        }
-////                        if (freq == 625.0) {
-////                            Log.e(TAG, "2-16");
-////                            note = "2-16";
-////                        }
-////                        if (freq == 656.25) {
-////                            Log.e(TAG, "2-17");
-////                            note = "2-17";
-////                        }
-////                        if (freq == 687.5) {
-////                            Log.e(TAG, "2-18");
-////                            note = "2-18";
-////                        }
-////                        if (freq == 718.75) {
-////                            Log.e(TAG, "2-19");
-////                            note = "2-19";
-////                        }
-////                        if (freq == 765.625) {
-////                            Log.e(TAG, "2-20");
-////                            note = "2-20";
-////                        }
-////                        if (freq == 812.5) {
-////                            Log.e(TAG, "2-21");
-////                            note = "2-21";
-////                        }
-//
-//
-//        if (freq == 187.5) {
-//            Log.e(TAG, "3rd");
-//            note = "3-0";
-//        }
-//        if (freq == 203.125) {
-//            Log.e(TAG, "3-1");
-//            note = "3-1";
-//        }
-//        if (freq == 218.75) {
-//            Log.e(TAG, "3-2");
-//            note = "3-2";
-//        }
-//        if (freq == 234.375) {
-//            Log.e(TAG, "3-3");
-//            note = "3-3";
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "3-4");
-//            note = "3-4";
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "3-5");
-//            note = "3-5";
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "3-6");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "3-7");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "3-8");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "3-9");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "3-10");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "3-11");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "3-12");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "3-13");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "3-14");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "3-15");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "3-16");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "3-17");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "3-18");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "3-19");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "3-20");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "3-21");
-//        }
-//
-//        /*****************BASS**********************/
-//        /******************4th*********************/
-//        if (freq == 140.625) {
-//            Log.e(TAG, "4th");
-//            note = "4-0";
-//        }
-//        if (freq == 156.25) {
-//            Log.e(TAG, "4-1");
-//            note = "4-1";
-//        }
-//        if (freq == 171.875) {
-//            Log.e(TAG, "4-2");
-//            note = "4-2";
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-3");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-4");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-5");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-6");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-7");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-8");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-9");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-10");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-11");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-12");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-13");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-14");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-15");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-16");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-17");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-18");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-19");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-20");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "4-21");
-//        }
-//
-//        /*********************5th*******************/
-//        if (freq == 109.375) {
-//            Log.e(TAG, "5-0");
-//            note = "5-0";
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-1");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-2");
-//        }
-//        if (freq == 125) {
-//            Log.e(TAG, "5-3");
-//            note = "5-3";
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-4");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-5");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-6");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-7");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-8");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-9");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-10");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-11");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-12");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-13");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-14");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-15");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-16");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-17");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-18");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-19");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-20");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "5-21");
-//        }
-//        /******************6th********************/
-//        if (freq == 78.125) {
-//            Log.e(TAG, "6-0");
-//            note = "6-0";
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-2");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-3");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-4");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-5");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-6");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-7");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-8");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-9");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-10");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-11");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-12");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-13");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-14");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-15");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-16");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-17");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-18");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-19");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-20");
-//        }
-//        if (freq == 1) {
-//            Log.e(TAG, "6-21");
-//        }
-//
-//        runOnUiThread(() -> noteText.setText(note));
-//
-//    }
-
 
 }
