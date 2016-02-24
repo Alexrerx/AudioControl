@@ -4,8 +4,9 @@ import android.content.Context;
 import android.widget.Toast;
 
 /**
- * Created by mihail on 20.02.16.
- */
+ *
+ * Калибровка перед использованием программы
+ * */
 public class Calibration {
     // TODO: 20.02.16 сделать калибровку
 
