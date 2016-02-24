@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -87,7 +86,6 @@ public class UI {
         layout.setOrientation(LinearLayout.VERTICAL);
 
 
-
         SlidingTabLayout slidingTab = new SlidingTabLayout(context);
         slidingTab.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
         slidingTab.setViewPager(pager);
@@ -115,12 +113,13 @@ public class UI {
                         }
                         case 1: { //Загрузка сохраненного таба
                             try {
-                                tab.loadTabulature(filesControl.openTab(
-                                                filesControl.getSavedTabsChooser()
-                                                        .getSelectedItem()
-                                                        .toString())
-                                );
-                            } catch (IOException e) {
+                                tab.clearTab();
+                                tab = filesControl.openTab(
+                                        filesControl.getSavedTabsChooser()
+                                                .getSelectedItem()
+                                                .toString());
+                            } catch (Exception e) {
+                                Toast.makeText(context, mainActivity.getString(R.string.error_tab_loading) + e.getMessage(), Toast.LENGTH_SHORT).show();
                                 e.printStackTrace();
                             }
                             break;
@@ -144,9 +143,9 @@ public class UI {
                 .setPositiveButton("Сохранить",
                         (dialog, which) -> {
                             //save
-                            boolean result;
+                            boolean saveResult = false;
                             try {
-                                result = filesControl.saveTab(tabNameEdit.getText().toString(), tab);
+                                saveResult = filesControl.saveTab(tabNameEdit.getText().toString(), tab);
                             } catch (IOException e) {
                                 Toast.makeText(context,
                                         mainActivity.getString(R.string.tab_saving_error),
@@ -154,11 +153,34 @@ public class UI {
                                         .show();
                                 e.printStackTrace();
                             }
-                            mainActivity.stopRecordBtn.setEnabled(false);
-                            dialog.dismiss();
+                            if (saveResult) {
+                                mainActivity.finishRecord();
+                                dialog.dismiss();
+                            } else {
+                                Toast.makeText(context,
+                                        mainActivity.getString(R.string.error_tab_loading),
+                                        Toast.LENGTH_SHORT)
+                                        .show();
+                            }
+
                         })
                 .setNegativeButton("Отмена",
                         (dialog, which) -> dialog.dismiss())
+                .setNeutralButton(R.string.exit_without_saving, (dialog1, which1) -> {
+
+                    new AlertDialog.Builder(context)
+                            .setTitle(mainActivity.getString(R.string.warning_not_saved))
+                            .setPositiveButton(R.string.ok, (dialog, which) -> {
+                                mainActivity.finishRecord();
+                                dialog.dismiss();
+                            })
+                            .setCancelable(true)
+                            .setNegativeButton(R.string.cancel, (dialog2, which2) -> {
+                                dialog2.dismiss();
+                            })
+                            .create()
+                            .show();
+                })
                 .setView(tabNameEdit)
                 .create()
                 .show();

@@ -18,9 +18,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:onClick="onRecorsStartClick"
-            android:text="@string/start_record">
+            android:text="@string/menu">
         </Button>
         <Button
+            android:textSize="12sp"
             android:id="@+id/button_stop_record"
             android:enabled="false"
             android:layout_width="match_parent"

@@ -17,8 +17,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
- * l
- * Created by mihail on 03.02.16.
+ *
+ * Табулатура: создание и именение
+ *
  */
 public class Tablature {
 
@@ -28,10 +29,10 @@ public class Tablature {
     private Context context;
     private LinearLayout tabLayout;
     private MainActivity mainActivity;
-    private int barTime = (int) Math.round(60000000.0 / 120.0);
     private int noteTime;
     private boolean works, pause;
-    private int startTime, barCount = 0, barIndex = 1, bpm = 120;
+    private int startTime, barCount = 0, barIndex = 0, bpm = 120;
+    private int barTime = (int) Math.round(60000000.0 / (double) bpm);
     private double eps;
     private Thread barThread;
 
@@ -63,14 +64,34 @@ public class Tablature {
             }
         });
 
+
+        initializeVars();
+        initializeTab();
+        initializeList();
+        setDefaultPitch();
+    }
+
+    public void clearTab() {
+        tabLayout.removeAllViews();
+        stringsList = new ArrayList<>();
+        initializeList();
+        initializeTab();
+        initializeVars();
+
+    }
+
+    private void initializeVars() {
+        barThread = new Thread(new BarThread());
+        barCount = 0;
+        barIndex = 0;
+        bpm = 120;
+    }
+
+    private void initializeList() {
         for (int i = 0; i < 7; i++) {
             stringsList.add(new ArrayList<>());
             stringsList.get(i).add(strings[i]);
         }
-
-        barThread = new Thread(new BarThread());
-        initializeTab();
-        setDefaultPitch();
     }
 
     private void initializeTab() {
@@ -79,11 +100,11 @@ public class Tablature {
         for (int i = 0; i < 6; i++) {
             TextView txt = new TextView(context);
             txt.setLayoutParams(new LinearLayout.LayoutParams(
-                    30,
+                    mainActivity.countSize(30),
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     1));
             txt.setText(strings[i]);
-            txt.setTextSize(16);
+            txt.setTextSize(mainActivity.countSize(16));
             layout.addView(txt);
         }
         tabLayout.addView(layout);
@@ -95,16 +116,16 @@ public class Tablature {
 
     private void setDefaultPitch() {
         // TODO: 06.02.16 Продумать тему с разными строями
+        // TODO: 22.02.16 не придумывать тему... решили забить...
         for (int i = 1; i < 7; i++) {
             currentPitch.put(i, 5);
         }
         currentPitch.put(3, 4);
+        currentPitch.put(1, 16);
 
     }
 
-    @SuppressWarnings("SynchronizeOnNonFinalField")
     public void startRecord() {
-        // TODO: 05.02.16 не работает старт потока, исправить!
         try {
             pause = false;
             works = true;
@@ -124,6 +145,7 @@ public class Tablature {
         if (!pause) {
             works = false;
         }
+        works = pause;
     }
 
     public void stopRecord() {
@@ -137,10 +159,14 @@ public class Tablature {
     public void addNote(int string, int fret) {
         noteTime = (int) (System.currentTimeMillis() - startTime);
         if (barTime - noteTime > eps) {
-            mainActivity.runOnUiThread(() -> tabLayout.addView(new Bar(context).setNote(new Note(string, fret))));
+            addNoteNoTime(string, fret);
         } else {
             temp.add(new Note(string, fret));
         }
+    }
+
+    public void addNoteNoTime(int string, int fret) {
+        mainActivity.runOnUiThread(() -> tabLayout.addView(new Bar(context).setNote(new Note(string, fret))));
     }
 
     public void addNote(String note) {
@@ -162,7 +188,7 @@ public class Tablature {
         });
     }
 
-    private void addBar() {
+    public void addBar() {
         barIndex = barCount++;
         mainActivity.runOnUiThread(() -> {
             tabLayout.addView(new Bar(context));
@@ -214,22 +240,6 @@ public class Tablature {
         barIndex = 0;
         this.bpm = tab.getBPM();
         this.stringsList = tab.getStringsList();
-
-        String s = mainActivity.getString(R.string.empty_note);
-        for (int i = 1; i < stringsList.get(0).size(); i++) {
-            if (stringsList.get(0).get(i).equals(mainActivity.getString(R.string.new_bar))) {
-                addBar();
-            } else {
-                for (int j = 0; j < 7; j++) {
-                    if (stringsList.get(j).get(i).equals(s)) {
-                        tabLayout.addView(new Bar(context).setNote(new Note(j,
-                                        Integer.valueOf(stringsList.get(j).get(i))))
-                        );
-                    }
-                }
-            }
-
-        }
     }
 
     public int getBPM() {
@@ -238,6 +248,10 @@ public class Tablature {
 
     public ArrayList<ArrayList<String>> getStringsList() {
         return stringsList;
+    }
+
+    public void setStringsList(ArrayList<ArrayList<String>> stringsList) {
+        this.stringsList = stringsList;
     }
 
     private class BarThread implements Runnable {
@@ -303,10 +317,10 @@ public class Tablature {
             for (int i = 0; i < maxIndex; i++) {
                 TextView txt = new TextView(context);
                 txt.setLayoutParams(new LinearLayout.LayoutParams(
-                        width,
-                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        mainActivity.countSize(width),
+                        mainActivity.countSize(35),
                         1));
-                txt.setTextSize(16);
+                txt.setTextSize(mainActivity.countSize(14));
                 txt.setGravity(TEXT_ALIGNMENT_CENTER);
                 txt.setText(text);
                 this.addView(txt);
@@ -321,48 +335,64 @@ public class Tablature {
 
         public LinearLayout setNote(Note note) {
             this.note = note;
-            Log.d("Tab",note.toString());
+            Log.d("Tab", note.toString());
             TextView textView = ((TextView) this.getChildAt(note.getString() - 1));
             textView.setText(String.valueOf(note.getFret()));
             if (note.AlternativeNotesExist()) {
-                textView.setBackgroundColor(changingNoteColor);
+//                textView.setBackgroundColor(changingNoteColor);
+                textView.setBackgroundResource(R.mipmap.note_determ);
                 textView.setOnClickListener(v -> {
                     if (v.getTag(this.getId()) == "changing") {
                         removeAlternativeNotes(note.getString());
-                        v.setBackgroundColor(emptyNoteColor);
+//                        v.setBackgroundColor(emptyNoteColor);
+                        v.setBackgroundResource(R.mipmap.note);
+                        v.setTag(this.getId(), "");
                     } else {
-                        setAlternativeNotes(note.getAlternativeNotes(note.getString(), note.getFret()), note.getString());
+                        setAlternativeNotes(note.getAlternativeNotes(note.getString(), note.getFret()), note.getBasicNote().getString());
                         v.setTag(this.getId(), "changing");
-                        v.setBackgroundColor(changingNoteColor);
+//                        v.setBackgroundColor(changingNoteColor);
+                        v.setBackgroundResource(R.mipmap.note_determ);
                     }
                 });
             }
 
-            stringsList.get(note.getString() - 1).add(String.valueOf(note.getFret()));
+
+            for (int string = 0; string < 6; string++) {
+                stringsList.get(string).add("--");
+            }
+            int fret = note.getFret();
+            int index = stringsList.get(note.getString() - 1).size() - 1;
+            stringsList.get(note.getString() - 1).set(index, fret < 10 ? String.valueOf(fret) + " " : String.valueOf(fret));
+
+
             return this;
         }
 
         void setAlternativeNotes(HashMap<Integer, Integer> map, int startSting) {
-            for (int i = startSting; i < map.size() + 1; i++) {
-                if (i != note.getString()) {
+            for (int i = startSting; i < 7; i++) {
+                if (i != note.getString() && map.get(i) != null) {
                     TextView text = ((TextView) this.getChildAt(i - 1));
                     text.setText(String.valueOf(map.get(i)));
                     text.setTag(text.getId(), new Note(i, map.get(i)));
-                    text.setBackgroundColor(alternativeNoteColor);
+//                    text.setBackgroundColor(alternativeNoteColor);
+                    text.setBackgroundResource(R.mipmap.note_new);
                     text.setOnClickListener(v -> {
                         this.removeAllViews();
                         ((Bar) this.setLayout(6, emptyNote, 30)).setNote((Note) v.getTag(v.getId()));
+                        v.setBackgroundResource(R.mipmap.note);
                     });
                 }
             }
         }
 
         void removeAlternativeNotes(int startSting) {
-            for (int i = startSting; i < 6; i++) {
+            for (int i = 0; i < 6; i++) {
+                if (i != (startSting - 1)) {
                 TextView text = ((TextView) this.getChildAt(i));
                 text.setText(emptyNote);
                 text.setBackgroundColor(emptyNoteColor);
                 text.setOnClickListener(null);
+                }
             }
         }
 
@@ -394,7 +424,7 @@ public class Tablature {
 
         @Override
         public String toString() {
-            return String.valueOf(string)+"-"+String.valueOf(fret);
+            return String.valueOf(string) + "-" + String.valueOf(fret);
         }
 
         public HashMap<Integer, Integer> getAlternativeNotes(int string, int fret) {
@@ -405,10 +435,8 @@ public class Tablature {
                 map.put(string, newfret);
                 for (int i = string + 1; i < 7; i++) {
                     newfret += currentPitch.get(i);
-                    if (newfret < 20) {
+                    if (newfret <= 20) {
                         map.put(i, newfret);
-                    } else {
-                        break;
                     }
                 }
             } else {
@@ -424,17 +452,14 @@ public class Tablature {
             while (newfret >= currentPitch.get(newstring)) {
                 newfret -= currentPitch.get(newstring--);
             }
+            Note note = new Note(newstring, newfret);
+            Log.d("BasicNote", note.toString() + " of " + this.toString());
             return new Note(newstring, newfret);
         }
 
         public boolean AlternativeNotesExist() {
             return !((string == 1) && (fret > 15) || (string == 6) && (fret < 5));
         }
-
-//        public Spinner getAlternativeNotesChooser(){
-//            Spinner spinner = new Spinner(context);
-//            spinner.setAdapter(new ArrayAdapter<In>());
-//        }
 
     }
 }

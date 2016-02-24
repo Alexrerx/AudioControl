@@ -22,7 +22,6 @@ public class FilesControl {
 
     private Context context;
     private MainActivity mainActivity;
-    private Spinner savedTabChooser;
 
     private static final String FILE_FOLDER = "AudioControl";
     private static final String PATH = android.os.Environment
@@ -30,7 +29,6 @@ public class FilesControl {
             + java.io.File.separator
             + FILE_FOLDER + java.io.File.separator;
 
-    // TODO: 05.02.16 проверить перевод
     private String TAB_EXTENSION = ".tab";
 
 
@@ -46,7 +44,6 @@ public class FilesControl {
             Toast.makeText(context, mainActivity.getString(R.string.folder_not_found),
                     Toast.LENGTH_SHORT).show();
             if (!dir.mkdirs()) {
-                // TODO: 05.02.16 обработать случай ошибки создания папки
                 new AlertDialog.Builder(context)
                         .setTitle(mainActivity.getString(R.string.unexpected_err))
                         .setPositiveButton(mainActivity.getString(R.string.exit), (dialog, which) -> {
@@ -65,6 +62,8 @@ public class FilesControl {
         } else {
             PrintWriter writer = new PrintWriter(file);
 
+            writer.println(tab.getBPM());
+
             for (int i = 0; i < 6; i++) {
                 String storedData = "";
                 for (String s : tab.getStringsList().get(i)) {
@@ -78,76 +77,58 @@ public class FilesControl {
         return true;
     }
 
-    public Tablature openTab(String name) throws IOException {
-        name = PATH + name + TAB_EXTENSION;
-        Tablature tab = new Tablature();
-//        File file   = new File(name);
+    public Tablature openTab(String name) throws Exception {
+        name = name + TAB_EXTENSION;
+        Tablature tab = new Tablature(context);
+        tab.clearTab();
         BufferedReader reader = openFile(name);
-        boolean initializated = false;
-        ArrayList<ArrayList<Integer[]>> list = new ArrayList<>();
-        for (int string = 1; string <= 6; string++) {
-            String line = reader.readLine();
-//            while((line.charAt(j)!='\n')){
-//                if((line.charAt(j)==c)){
-//
-//                }
-//            }
-            String[] bar = line.split("|");
 
-            if (!initializated) {
-                initializated = true;
-                for (String aBar : bar) {
-                    list.add(new ArrayList<>());
-                }
-            }
+        tab.setBPM(Integer.valueOf(reader.readLine()));
 
-
-            int i = 1;
-            while (i < bar[0].length()) {
-                if (bar[0].charAt(i) != '-') {
-                    String num_s = "";
-                    while (bar[0].charAt(i) != '-') {
-                        num_s += bar[0].charAt(i++);
-                    }
-                    Integer note[] = {string, Integer.valueOf(num_s)};
-                    list.get(i).add(note);
-                }
-                i++;
-            }
-
-            for (int bar_i = 1; bar_i < bar.length; bar_i++) {
-                i = 0;
-                while (i < bar[bar_i].length()) {
-                    if (bar[bar_i].charAt(i) != '-') {
-                        String num_s = "";
-                        while (bar[bar_i].charAt(i) != '-') {
-                            num_s += bar[bar_i].charAt(i++);
-                        }
-                        tab.addNote(string, Integer.valueOf(num_s));
-                    }
-                    i++;
-                }
-            }
+        ArrayList<String> l = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            l.add(reader.readLine());
         }
 
-
-
+        for (int bar = 1; bar < l.get(0).length(); bar++) {
+            if (l.get(0).charAt(bar) == '|') {
+                tab.addBar();
+            } else {
+                for (int string = 0; string < 6; string++) {
+                    String s = String.valueOf(l.get(string).charAt(bar)) + String.valueOf(l.get(string).charAt(bar + 1));
+                    if (!s.equals("--")) {
+                        try {
+                            tab.addNoteNoTime(string, Integer.valueOf(s));
+                        } catch (NumberFormatException e) {
+                            try {
+                                tab.addNoteNoTime(string, Integer.valueOf(String.valueOf(s.charAt(0))));
+                            } catch (NumberFormatException ee) {
+                                e.printStackTrace();
+                            }
+                        }
+                        break;
+                    }
+                }
+                bar++;
+            }
+        }
 
         return tab;
     }
 
     public Spinner getSavedTabsChooser() {
-        if (savedTabChooser != null) {
-            return savedTabChooser;
-        } else {
-            savedTabChooser = new Spinner(context);
-            // TODO: 05.02.16 доделать вывод списка табов
-            ArrayList<String> list = new ArrayList<>();
-            list.add("DEMO");
-            savedTabChooser.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, list));
-
-            return savedTabChooser;
+        Spinner savedTabChooser = new Spinner(context);
+        File path = new File(PATH);
+        File[] files = path.listFiles();
+        ArrayList<String> fileslist = new ArrayList<String>();
+        for (File f : files) {
+            String s = String.valueOf(f.getName());
+            if (s.contains(".tab")) {
+                fileslist.add(s.substring(0, s.length() - 4));
+            }
         }
+        savedTabChooser.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, fileslist));
+            return savedTabChooser;
     }
 
     public void saveFile(String name, ArrayList<Object> list) throws FileNotFoundException {
