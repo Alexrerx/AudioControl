@@ -238,7 +238,7 @@ public class MainActivity extends FragmentActivity {
      *
      * @return pixels
      */
-    int countSize(int pixels) {
+    public int countSize(int pixels) {
         return (int) (pixels * (realDPI / myDPI));
     }
 

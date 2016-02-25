@@ -22,9 +22,12 @@ public class Calibration {
         mainActivity.runOnUiThread(() ->
                         Toast.makeText(
                                 context,
-                                "СДЕЛАЙ КАЛИБРОВКУУУ!!! НЕ РАБОТАЕЕЕЕТ!!",
+                                "Пожалуйста,сыграйте 1ую струну,зажатую на 5м ладу",
                                 Toast.LENGTH_SHORT)
                                 .show()
+
+
+
         );
 
     }

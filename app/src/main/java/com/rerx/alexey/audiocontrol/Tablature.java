@@ -104,7 +104,7 @@ public class Tablature {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     1));
             txt.setText(strings[i]);
-            txt.setTextSize(mainActivity.countSize(16));
+            txt.setTextSize(16);
             layout.addView(txt);
         }
         tabLayout.addView(layout);
@@ -320,7 +320,7 @@ public class Tablature {
                         mainActivity.countSize(width),
                         mainActivity.countSize(35),
                         1));
-                txt.setTextSize(mainActivity.countSize(14));
+                txt.setTextSize(14);
                 txt.setGravity(TEXT_ALIGNMENT_CENTER);
                 txt.setText(text);
                 this.addView(txt);

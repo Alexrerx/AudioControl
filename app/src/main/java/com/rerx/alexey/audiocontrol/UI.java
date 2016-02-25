@@ -138,9 +138,9 @@ public class UI {
     void setStopAlertDialog() {
         final EditText tabNameEdit = new EditText(context);
         new AlertDialog.Builder(context)
-                .setTitle("Введите название таба")
+                .setTitle(mainActivity.getString(R.string.tab_name))
                 .setCancelable(false)
-                .setPositiveButton("Сохранить",
+                .setPositiveButton(mainActivity.getString(R.string.save),
                         (dialog, which) -> {
                             //save
                             boolean saveResult = false;
@@ -164,7 +164,7 @@ public class UI {
                             }
 
                         })
-                .setNegativeButton("Отмена",
+                .setNegativeButton(mainActivity.getString(R.string.cancel),
                         (dialog, which) -> dialog.dismiss())
                 .setNeutralButton(R.string.exit_without_saving, (dialog1, which1) -> {
 
@@ -185,7 +185,7 @@ public class UI {
                 .create()
                 .show();
 
-        tabNameEdit.setText("Новый таб 1");
+        tabNameEdit.setText(mainActivity.getString(R.string.new_tab));
     }
 
     class myPager extends PagerAdapter {
@@ -235,11 +235,11 @@ public class UI {
         public CharSequence getPageTitle(int position) {
             CharSequence sequence = "";
             if (position == 0) {
-                sequence = "Установите темп";
+                sequence = mainActivity.getString(R.string.temp);
             } else if (position == 1) {
-                sequence = "Выберете файл";
+                sequence = mainActivity.getString(R.string.file);
             } else if (position == 2) {
-                sequence = "Настройки";
+                sequence = mainActivity.getString(R.string.settings);
             }
             return sequence;
         }
