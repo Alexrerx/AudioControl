@@ -147,20 +147,14 @@ public class UI {
                             try {
                                 saveResult = filesControl.saveTab(tabNameEdit.getText().toString(), tab);
                             } catch (IOException e) {
-                                Toast.makeText(context,
-                                        mainActivity.getString(R.string.tab_saving_error),
-                                        Toast.LENGTH_SHORT)
-                                        .show();
+                                showToast(mainActivity.getString(R.string.tab_saving_error));
                                 e.printStackTrace();
                             }
                             if (saveResult) {
                                 mainActivity.finishRecord();
                                 dialog.dismiss();
                             } else {
-                                Toast.makeText(context,
-                                        mainActivity.getString(R.string.error_tab_loading),
-                                        Toast.LENGTH_SHORT)
-                                        .show();
+                                showToast(mainActivity.getString(R.string.error_tab_loading));
                             }
 
                         })
@@ -276,6 +270,65 @@ public class UI {
             layout.addView(button);
             return layout;
         }
+    }
+
+    public void showToast(String text) {
+        mainActivity.runOnUiThread(() ->
+                        Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+        );
+    }
+
+
+    public AlertDialog createCalibrationDialog(Calibration calibration) {
+        return new AlertDialog.Builder(context)
+                .setTitle(mainActivity.getString(R.string.calibrate))
+                .setView(getCalibrationLayout(calibration))
+                .setNegativeButton(R.string.cancel, (dialog, which) -> {
+                    calibration.stopReading();
+                    dialog.dismiss();
+                })
+                .setPositiveButton(R.string.save, (dialog1, which1) -> {
+                    calibration.stopReading();
+                    mainActivity.setBaseFreq(calibration.getMaxFreq());
+                })
+                .create();
+    }
+
+    private LinearLayout getCalibrationLayout(Calibration calibration) {
+        LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.HORIZONTAL);
+        layout.addView(getCalibratioinFrequenceEdit());
+        layout.addView(getCalibrationStartStopButton(calibration));
+        return layout;
+    }
+
+    private Button getCalibrationStartStopButton(Calibration calibration) {
+        Button button = new Button(context);
+        button.setText(mainActivity.getString(R.string.start));
+        button.setLayoutParams(new LinearLayout.LayoutParams(-2, -2, 3));
+        button.setOnClickListener(v -> {
+            if (calibration.isReading) {
+                calibration.stopReading();
+                button.setText(mainActivity.getString(R.string.start));
+            } else {
+                calibration.startReading();
+                button.setText(mainActivity.getString(R.string.stop));
+            }
+        });
+
+        return button;
+    }
+
+    private EditText freqEdit;
+
+    private EditText getCalibratioinFrequenceEdit() {
+        freqEdit = new EditText(context);
+        freqEdit.setLayoutParams(new LinearLayout.LayoutParams(-2, -2, 5));
+        return freqEdit;
+    }
+
+    public void printCalibrationFrequnce(int frequnce) {
+        mainActivity.runOnUiThread(() -> freqEdit.setText(String.valueOf(frequnce)));
     }
 
 }

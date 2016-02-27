@@ -192,7 +192,9 @@ public class Tablature {
         barIndex = barCount++;
         mainActivity.runOnUiThread(() -> {
             tabLayout.addView(new Bar(context));
-            tabLayout.addView(new Bar(context, R.string.new_bar).setBarNumber(barCount));
+//            if(isBarNumberActive) // TODO: 27.02.16 сделать номер бара без косяков
+//            tabLayout.addView(new Bar(context, R.string.new_bar).setBarNumber(barCount));
+            tabLayout.addView(new Bar(context, R.string.new_bar));
         });
     }
 
@@ -292,10 +294,11 @@ public class Tablature {
     private class Bar extends LinearLayout {
 
         private Note note;
-        private int changingNoteColor = mainActivity.getResources()
-                .getColor(R.color.changing_note),
-                alternativeNoteColor = mainActivity.getResources()
-                        .getColor(R.color.alternative_note),
+        private int
+//                changingNoteColor = mainActivity.getResources()
+//                .getColor(R.color.changing_note),
+//                alternativeNoteColor = mainActivity.getResources()
+//                        .getColor(R.color.alternative_note),
                 emptyNoteColor = mainActivity.getResources()
                         .getColor(R.color.empty_note);
         private String emptyNote = mainActivity.getString(R.string.empty_note);
@@ -310,7 +313,9 @@ public class Tablature {
         public Bar(Context context, int resId) {
             super(context);
             this.setOrientation(LinearLayout.VERTICAL);
-            setLayout(7, mainActivity.getString(resId), 20);
+//            if(isBarNumberActive)
+//            setLayout(7, mainActivity.getString(resId), 20);
+            setLayout(6, mainActivity.getString(resId), 20);
         }
 
         private LinearLayout setLayout(int maxIndex, String text, int width) {
@@ -323,6 +328,7 @@ public class Tablature {
                 txt.setTextSize(14);
                 txt.setGravity(TEXT_ALIGNMENT_CENTER);
                 txt.setText(text);
+                txt.setTextAlignment(TEXT_ALIGNMENT_CENTER);
                 this.addView(txt);
                 stringsList.get(i).add(text);
             }
@@ -399,6 +405,9 @@ public class Tablature {
 
         public LinearLayout setBarNumber(int barNumber) {
             ((TextView) this.getChildAt(6)).setText(String.valueOf(barNumber));
+            ((TextView) this.getChildAt(6)).setTextAlignment(TEXT_ALIGNMENT_CENTER);
+            ((TextView) this.getChildAt(6)).setRotation(-50);
+            ((TextView) this.getChildAt(6)).setLines(1);
             stringsList.get(6).add(String.valueOf(barNumber));
             return this;
         }

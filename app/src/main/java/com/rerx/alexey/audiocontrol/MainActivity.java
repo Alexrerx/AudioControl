@@ -41,7 +41,7 @@ public class MainActivity extends FragmentActivity {
     HorizontalScrollView amplitudeScrollTOP, amplitudeScrollBOTTOM;
 
     double realDPI, myDPI = 240.0;
-    ImageView iview;
+    //    ImageView iview;
     Texts texts;
     Context context;
     short myBufferSize = 1024;
@@ -209,8 +209,6 @@ public class MainActivity extends FragmentActivity {
 
 
     public void onRecorsStartClick(View v) {
-
-
         if (!(isReading || isPaused)) {
             ui.setStartAlertDialog(); //открытие меню
         } else if (isReading) {
@@ -218,12 +216,11 @@ public class MainActivity extends FragmentActivity {
         } else if (isPaused) {
             startRecord();
         }
-
-
     }
 
 
     public void finishRecord() {
+        stopRecord();
         stopRecordBtn.setEnabled(false);
         startRecordBtn.setText(getString(R.string.menu));
         isPaused = false;
@@ -256,21 +253,19 @@ public class MainActivity extends FragmentActivity {
     }
 
     public void onRecordStopClick(View v) {
-        stopRecord();
+//        stopRecord();
+        pauseRecord();
         ui.setStopAlertDialog();
     }
 
     private void stopRecord() {
-        readStop();
         Log.e(TAG, "record stop ");
         audioRecord.stop();
         tab.stopRecord();
-
-
     }
 
     private void pauseRecord() {
-        readStop();
+        isReading = false;
         isPaused = true;
         startRecordBtn.setText(getString(R.string.continue_record));
         Log.i(TAG, "Record paused");
@@ -297,7 +292,6 @@ public class MainActivity extends FragmentActivity {
 
             int freq = 0;
 
-
             myBuffer = new short[myBufferSize];
             myBufferOld = new short[myBufferSize];
             window = new Window();
@@ -318,57 +312,42 @@ public class MainActivity extends FragmentActivity {
             while (isReading) {
 
 //                iview.setImageDrawable(texts);
-
                 readCount = audioRecord.read(myBuffer, 0, myBufferSize);
-
-//
                 for (int i = 0; i < myBuffer.length; i++) {
                     myBuffer[i] *= window.Gausse(i, myBufferSize);
 //                    myBuffer[i] *= window.Hamming(myBuffer[i], myBufferSize);
 //                    myBuffer[i] *= sensivityRatio;
                 }
-
                 frame1 = complex.realToComplex(myBuffer);
 
-
-                int time0 = (int) System.currentTimeMillis();
                 spec1 = fftAnother.DecimationInTime(frame1, true, false);
 
-                int time2 = (int) System.currentTimeMillis();
-                Log.d("time1", String.valueOf(time2 - time0));
-
-                Log.i("filter", "1");
-                final LinkedHashMap<Integer, Integer> spectrumNew = Filters.GetJoinedSpectrum(spec0, spec1, ShiftsPerFrame, sampleRate);
-
-//                frame0 = frame1;
-                Log.i("fft", "2");
+                final LinkedHashMap<Integer, Integer> spectrumNew =
+                        Filters.GetJoinedSpectrum(spec0, spec1, ShiftsPerFrame, sampleRate);
                 new Thread(() -> {
                     this.spec0 = fftAnother.DecimationInTime(frame1, true, false);
                 }).start();
-
 
                 if (isVisualized) {
                     setAFC((spectrumNew));  //Визуализация
                 }
 
+                int freq_tmp = getFrequence(spectrumNew);
 
-                if (getFrequence(spectrumNew) != freq) {
-                    freq = getFrequence(spectrumNew);
+                if (freq_tmp != freq) {
+                    freq = freq_tmp;
                     if ((freq > 60) && (freq < 1047)) {
 
                         final String finalFreq = String.valueOf(freq);
                         runOnUiThread(() -> textView.setText(finalFreq));
 //                        ((Texts)iview.getDrawable()).printFreq(String.valueOf(freq));
 //                        texts.setFreq(String.valueOf(freq));
+//                        Log.i("freq",finalFreq);
                         determineNotes(freq);
                         tab.addNote(note);
-//                        texts.setNote(note);
                     }
-
+//                        texts.setNote(note);
                 }
-
-                int time4 = (int) System.currentTimeMillis();
-                Log.d("time4", String.valueOf(time4 - time0));
 
             }
 
@@ -385,7 +364,10 @@ public class MainActivity extends FragmentActivity {
         return (int) f;
     }
 
-
+    public void setBaseFreq(int baseFreq) {
+        this.baseFreq = baseFreq;
+        ui.showToast(getString(R.string.freq_is_setted) + " " + baseFreq);
+    }
 
     public void setAmplitude(int amplitude, final LinearLayout layout) {
         final ImageView img = new ImageView(context);
@@ -435,10 +417,6 @@ public class MainActivity extends FragmentActivity {
     }
 
 
-    public void readStop() {
-        Log.e(TAG, "read stop");
-        isReading = false;
-    }
 
 
 

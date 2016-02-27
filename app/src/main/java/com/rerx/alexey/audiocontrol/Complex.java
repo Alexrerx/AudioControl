@@ -165,6 +165,8 @@ public class Complex {
 
     public Complex[] realToComplex(short arr[]) {
         Complex[] complex = new Complex[arr.length];
+        try {
+
 
 //        int first_block = arr.length / 3;
         int second_block = arr.length;
@@ -188,6 +190,9 @@ public class Complex {
 //                e.printStackTrace();
 //            }
 //        }
+        } catch (Exception e) {
+            Log.e("Complex", e.toString());
+        }
         return complex;
     }
 

@@ -28,6 +28,11 @@
     <string name="tab_name">Введите название таба</string>
     <string name="save">Сохранить</string>
     <string name="new_tab">Новый таб 1</string>
+    <string name="freq_is_setted">Установлено значение</string>
 
 
+    <string name="calibrate">Определите частоту ноты ля первой октавы</string>
+    <string name="default_calibrate_text">Нажмите чтобы начать</string>
+    <string name="stop">Стоп</string>
+    <string name="start">Старт</string>
 </resources>
