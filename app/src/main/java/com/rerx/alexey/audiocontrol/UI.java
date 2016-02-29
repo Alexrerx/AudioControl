@@ -115,9 +115,7 @@ public class UI {
                             try {
                                 tab.clearTab();
                                 tab = filesControl.openTab(
-                                        filesControl.getSavedTabsChooser()
-                                                .getSelectedItem()
-                                                .toString());
+                                        ((Spinner)pager.getChildAt(1)).getSelectedItem().toString());
                             } catch (Exception e) {
                                 Toast.makeText(context, mainActivity.getString(R.string.error_tab_loading) + e.getMessage(), Toast.LENGTH_SHORT).show();
                                 e.printStackTrace();

@@ -84,7 +84,8 @@ public class FilesControl {
         tab.clearTab();
         BufferedReader reader = openFile(name);
 
-        tab.setBPM(Integer.valueOf(reader.readLine()));
+        String s1 = reader.readLine();
+        tab.setBPM(Integer.valueOf(s1));
 
         ArrayList<String> l = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
