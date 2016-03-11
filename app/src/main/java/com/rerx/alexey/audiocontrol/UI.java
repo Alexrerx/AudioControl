@@ -2,6 +2,7 @@ package com.rerx.alexey.audiocontrol;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -27,7 +28,6 @@ public class UI {
     Context context;
     MainActivity mainActivity;
     FilesControl filesControl;
-    Tablature tab;
 
     int smallHeight = 90, bigHeight = 200;
 
@@ -35,7 +35,6 @@ public class UI {
         this.context = context;
         mainActivity = (MainActivity) context;
         filesControl = mainActivity.filesControl;
-        tab = mainActivity.tab;
         setValues();
     }
 
@@ -113,9 +112,10 @@ public class UI {
                         }
                         case 1: { //Загрузка сохраненного таба
                             try {
-                                tab.clearTab();
-                                tab = filesControl.openTab(
-                                        ((Spinner)pager.getChildAt(1)).getSelectedItem().toString());
+                                mainActivity.tab.clearTab();
+                                mainActivity.tab = filesControl.openTab(
+                                        ((Spinner) pager.getChildAt(1)).getSelectedItem().toString());
+                                setTabEditingMode(true);
                             } catch (Exception e) {
                                 Toast.makeText(context, mainActivity.getString(R.string.error_tab_loading) + e.getMessage(), Toast.LENGTH_SHORT).show();
                                 e.printStackTrace();
@@ -135,24 +135,30 @@ public class UI {
 
     void setStopAlertDialog() {
         final EditText tabNameEdit = new EditText(context);
+        tabNameEdit.setText(mainActivity.tab.getName());
         new AlertDialog.Builder(context)
-                .setTitle(mainActivity.getString(R.string.tab_name))
+                .setTitle(mainActivity.getString(R.string.input_tab_name))
                 .setCancelable(false)
                 .setPositiveButton(mainActivity.getString(R.string.save),
                         (dialog, which) -> {
                             //save
                             boolean saveResult = false;
                             try {
-                                saveResult = filesControl.saveTab(tabNameEdit.getText().toString(), tab);
+                                saveResult = filesControl.saveTab(tabNameEdit.getText().toString(), mainActivity.tab, false);
                             } catch (IOException e) {
-                                showToast(mainActivity.getString(R.string.tab_saving_error));
                                 e.printStackTrace();
+                                showToast(mainActivity.getString(R.string.tab_saving_error));
                             }
+
                             if (saveResult) {
                                 mainActivity.finishRecord();
                                 dialog.dismiss();
                             } else {
-                                showToast(mainActivity.getString(R.string.error_tab_loading));
+                                if (mainActivity.tab.isEditing()) {
+                                    setShureRewriteDialog(dialog);
+                                } else {
+                                    showToast(mainActivity.getString(R.string.tab_saving_error));
+                                }
                             }
 
                         })
@@ -164,6 +170,7 @@ public class UI {
                             .setTitle(mainActivity.getString(R.string.warning_not_saved))
                             .setPositiveButton(R.string.ok, (dialog, which) -> {
                                 mainActivity.finishRecord();
+                                setTabEditingMode(false);
                                 dialog.dismiss();
                             })
                             .setCancelable(true)
@@ -177,8 +184,31 @@ public class UI {
                 .create()
                 .show();
 
-        tabNameEdit.setText(mainActivity.getString(R.string.new_tab));
     }
+
+    public void setShureRewriteDialog(DialogInterface savingDialog) {
+        new AlertDialog.Builder(context)
+                .setTitle(mainActivity.getString(R.string.rewrite))
+                .setPositiveButton(R.string.ok, (dialog, which) -> {
+                    try {
+                        if (filesControl.saveTab(mainActivity.tab.getName(), mainActivity.tab, true)) {
+                            dialog.dismiss();
+                            savingDialog.dismiss();
+                            setTabEditingMode(false);
+                            mainActivity.finishRecord();
+                        } else {
+                            showToast(mainActivity.getString(R.string.tab_saving_error));
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        showToast(mainActivity.getString(R.string.tab_saving_error));
+                    }
+                })
+                .setNegativeButton(R.string.cancel, (dialog1, which1) -> dialog1.dismiss())
+                .create()
+                .show();
+    }
+
 
     class myPager extends PagerAdapter {
 
@@ -203,7 +233,7 @@ public class UI {
             Spinner spinner = new Spinner(context);
 
             if (position == 0) {
-                spinner = tab.getBpmSetter();
+                spinner = mainActivity.tab.getBpmSetter();
                 Log.i("instantItem", "[" + position + "] setted");
                 container.addView(spinner);
                 return spinner;
@@ -327,6 +357,18 @@ public class UI {
 
     public void printCalibrationFrequnce(int frequnce) {
         mainActivity.runOnUiThread(() -> freqEdit.setText(String.valueOf(frequnce)));
+    }
+
+    private void setTabEditingMode(boolean mode) {
+        if (mode) {
+            mainActivity.startRecordBtn.setEnabled(false);
+            mainActivity.stopRecordBtn.setEnabled(true);
+            mainActivity.tab.setEditingMode(true);
+        } else {
+            mainActivity.startRecordBtn.setEnabled(true);
+            mainActivity.stopRecordBtn.setEnabled(false);
+            mainActivity.tab.setEditingMode(false);
+        }
     }
 
 }

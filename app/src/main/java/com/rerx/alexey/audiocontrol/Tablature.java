@@ -35,6 +35,9 @@ public class Tablature {
     private int barTime = (int) Math.round(60000000.0 / (double) bpm);
     private double eps;
     private Thread barThread;
+    private int notesIndex = 1;
+    private String name;
+    private boolean isEditing = false;
 
 
     private ArrayList<Note> temp = new ArrayList<>();
@@ -47,7 +50,7 @@ public class Tablature {
     Tablature() {  //empty constructor
     }
 
-    Tablature(Context context) {
+    Tablature(Context context, String name) {
         this.context = context;
         mainActivity = (MainActivity) context;
         tabLayout = (LinearLayout) mainActivity.findViewById(R.id.tabLayout);
@@ -63,7 +66,7 @@ public class Tablature {
 
             }
         });
-
+        this.name = name;
 
         initializeVars();
         initializeTab();
@@ -78,6 +81,18 @@ public class Tablature {
         initializeTab();
         initializeVars();
 
+    }
+
+    public void setEditingMode(boolean isEditing) {
+        this.isEditing = isEditing;
+    }
+
+    public boolean isEditing() {
+        return isEditing;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     private void initializeVars() {
@@ -108,6 +123,10 @@ public class Tablature {
             layout.addView(txt);
         }
         tabLayout.addView(layout);
+    }
+
+    public String getName() {
+        return name;
     }
 
     public boolean isPaused() {
@@ -166,7 +185,10 @@ public class Tablature {
     }
 
     public void addNoteNoTime(int string, int fret) {
-        mainActivity.runOnUiThread(() -> tabLayout.addView(new Bar(context).setNote(new Note(string, fret))));
+        mainActivity.runOnUiThread(() ->
+                tabLayout.addView((
+                        (Bar) new Bar(context)
+                                .setNote(new Note(string, fret), -1))));
     }
 
     public void addNote(String note) {
@@ -184,7 +206,7 @@ public class Tablature {
 
     private void addBeat(Note note) {
         mainActivity.runOnUiThread(() -> {
-            tabLayout.addView(new Bar(context).setNote(note));
+            tabLayout.addView((new Bar(context).setNote(note, -1)));
         });
     }
 
@@ -195,6 +217,7 @@ public class Tablature {
 //            if(isBarNumberActive) // TODO: 27.02.16 сделать номер бара без косяков
 //            tabLayout.addView(new Bar(context, R.string.new_bar).setBarNumber(barCount));
             tabLayout.addView(new Bar(context, R.string.new_bar));
+            notesIndex += 2;
         });
     }
 
@@ -256,6 +279,14 @@ public class Tablature {
         this.stringsList = stringsList;
     }
 
+    public void prepareToSaving() {
+        for (int i = 0; i < stringsList.size(); i++) {
+
+
+        }
+    }
+
+
     private class BarThread implements Runnable {
 
         @Override
@@ -291,6 +322,7 @@ public class Tablature {
 
     }
 
+
     private class Bar extends LinearLayout {
 
         private Note note;
@@ -302,7 +334,7 @@ public class Tablature {
                 emptyNoteColor = mainActivity.getResources()
                         .getColor(R.color.empty_note);
         private String emptyNote = mainActivity.getString(R.string.empty_note);
-
+        private int noteIndex = 0;
 
         public Bar(Context context) {
             super(context);
@@ -339,7 +371,28 @@ public class Tablature {
             return note;
         }
 
-        public LinearLayout setNote(Note note) {
+        private void setNoteToList(Note note, int index) {
+            String fret = (note.getFret() < 10) ? String.valueOf(note.getFret()) + " " : String.valueOf(note.getFret());
+
+            try {
+                for (int i = 0; i < 6; i++) {
+                    stringsList.get(i).set(index, emptyNote);
+                }
+                stringsList.get(note.getString() - 1).set(index, fret);
+            } catch (IndexOutOfBoundsException e) {
+                for (int i = 0; i < 6; i++) {
+                    stringsList.get(i).add(emptyNote);
+                }
+                stringsList.get(note.getString() - 1).set(index, fret);
+            }
+        }
+
+
+        public LinearLayout setNote(Note note, int index) {
+            if (index == -1) {
+                index = (noteIndex = notesIndex++);
+            }
+            setNoteToList(note, index);
             this.note = note;
             Log.d("Tab", note.toString());
             TextView textView = ((TextView) this.getChildAt(note.getString() - 1));
@@ -361,16 +414,6 @@ public class Tablature {
                     }
                 });
             }
-
-
-            for (int string = 0; string < 6; string++) {
-                stringsList.get(string).add("--");
-            }
-            int fret = note.getFret();
-            int index = stringsList.get(note.getString() - 1).size() - 1;
-            stringsList.get(note.getString() - 1).set(index, fret < 10 ? String.valueOf(fret) + " " : String.valueOf(fret));
-
-
             return this;
         }
 
@@ -384,8 +427,9 @@ public class Tablature {
                     text.setBackgroundResource(R.mipmap.note_new);
                     text.setOnClickListener(v -> {
                         this.removeAllViews();
-                        ((Bar) this.setLayout(6, emptyNote, 30)).setNote((Note) v.getTag(v.getId()));
+                        ((Bar) this.setLayout(6, emptyNote, 30)).setNote((Note) v.getTag(v.getId()), this.noteIndex);
                         v.setBackgroundResource(R.mipmap.note);
+
                     });
                 }
             }
@@ -402,7 +446,7 @@ public class Tablature {
             }
         }
 
-
+        //Подпись номера такта убрана за ненадобностью
         public LinearLayout setBarNumber(int barNumber) {
             ((TextView) this.getChildAt(6)).setText(String.valueOf(barNumber));
             ((TextView) this.getChildAt(6)).setTextAlignment(TEXT_ALIGNMENT_CENTER);
@@ -417,6 +461,14 @@ public class Tablature {
     public class Note {
         private int string; //Струна, с 1 по 6
         private int fret; //Лад, с 0 по 20
+//        private int noteIndex;
+
+
+//        Note(int string, int fret,int notesIndex) {
+//            this.string = string;
+//            this.fret = fret;
+//            this.noteIndex = notesIndex;
+//        }
 
         Note(int string, int fret) {
             this.string = string;

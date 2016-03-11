@@ -6,12 +6,14 @@ import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
+import android.view.SurfaceHolder;
+import android.widget.TextView;
 
 /**
  * Класс рисования текста частоты и ноты
  * Created by mihail on 10.02.16.
  */
-public class Texts extends Drawable {
+public class CanvasDrawing extends Drawable {
     Canvas canvas;
     Context context;
     MainActivity mainActivity;
@@ -25,8 +27,9 @@ public class Texts extends Drawable {
     private Paint paint = new Paint();
     private String freq = "0";
     private String note = "0";
+    private boolean works = false;
 
-    Texts(Context context) {
+    CanvasDrawing(Context context) {
         this.context = context;
         mainActivity = (MainActivity) context;
     }
@@ -55,6 +58,13 @@ public class Texts extends Drawable {
     @Override
     public void setColorFilter(ColorFilter colorFilter) {
 
+    }
+
+    @Override
+    public int[] getState() {
+
+
+        return super.getState();
     }
 
 
@@ -96,4 +106,56 @@ public class Texts extends Drawable {
     public void setNote(String note) {
         this.note = note;
     }
+
+
+//    class DrawingTread extends Thread {
+//
+//
+//        @Override
+//        public void run() {
+//            super.run();
+//
+//            SurfaceHolder surfaceHolder = getHolder();
+//            while(true){
+//
+//                if(works){
+//                    Canvas canvas;
+//                    if (surfaceHolder.getSurface().isValid()) {
+//
+//                        canvas = surfaceHolder.lockCanvas();
+//                        if (canvas != null) {
+//                            try {
+//                                draw(canvas);
+//                            } finally {
+//                                surfaceHolder.unlockCanvasAndPost(canvas);
+//                            }
+//                        }
+//                        try {
+//                            sleep(200);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//
+//                        }
+//                    }
+//                }else {
+//                    try {
+//                        sleep(30);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//// else {
+////                try {
+////                    sleep(50);
+////                } catch (InterruptedException e) {
+////                    e.printStackTrace();
+////                    return;
+////                }
+////            }
+//            }
+//        }
+//        }
+
 }
+
+

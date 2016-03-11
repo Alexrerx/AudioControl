@@ -25,7 +25,7 @@ import java.util.Map;
 public class MainActivity extends FragmentActivity {
     FFT fft;
 
-    TextView textView, noteText;
+    TextView textView, noteText, infoText;
     Button startRecordBtn, stopRecordBtn;
 
     FFTAnother fftAnother;
@@ -37,12 +37,12 @@ public class MainActivity extends FragmentActivity {
 
     final String TAG = "myLogs";
     Window window;
-    LinearLayout amplitudeLayoutTOP, amplitudeLayoutBOTTOM;
-    HorizontalScrollView amplitudeScrollTOP, amplitudeScrollBOTTOM;
+    LinearLayout amplitudeLayoutTOP;
+    HorizontalScrollView amplitudeScrollTOP;
 
     double realDPI, myDPI = 240.0;
     //    ImageView iview;
-    Texts texts;
+    CanvasDrawing canvasDrawing;
     Context context;
     short myBufferSize = 1024;
     int amplitudeColor;
@@ -74,9 +74,9 @@ public class MainActivity extends FragmentActivity {
 
         context = this;
 
-        tab = new Tablature(context);
+        tab = new Tablature(context, getString(R.string.new_tab_name));
         filesControl = new FilesControl(context);
-        texts = new Texts(context);
+        canvasDrawing = new CanvasDrawing(context);
         ui = new UI(context);
 
         amplitudeColor = getResources().getColor(R.color.amplitude);
@@ -87,14 +87,13 @@ public class MainActivity extends FragmentActivity {
 
         textView = (TextView) findViewById(R.id.a110);
         noteText = (TextView) findViewById(R.id.note);
-        amplitudeLayoutTOP = (LinearLayout) findViewById(R.id.amplitudeLayoutTOP);
-        amplitudeLayoutBOTTOM = (LinearLayout) findViewById(R.id.amplitudeLayoutBOTTOM);
+        infoText = (TextView) findViewById(R.id.info);
 
+        amplitudeLayoutTOP = (LinearLayout) findViewById(R.id.amplitudeLayoutTOP);
         amplitudeScrollTOP = (HorizontalScrollView) findViewById(R.id.amplitudeSCrollTOP);
-        amplitudeScrollBOTTOM = (HorizontalScrollView) findViewById(R.id.amplitudeSCrollBOTTOM);
 
 //        iview = ((ImageView) findViewById(R.id.text_note));
-//        texts = (Texts) iview.getDrawable();
+//        canvasDrawing = (CanvasDrawing) iview.getDrawable();
 
 
         createAudioRecorder();
@@ -223,6 +222,7 @@ public class MainActivity extends FragmentActivity {
         stopRecord();
         stopRecordBtn.setEnabled(false);
         startRecordBtn.setText(getString(R.string.menu));
+        startRecordBtn.setEnabled(true);
         isPaused = false;
         isReading = false;
         tab.clearTab();
@@ -249,6 +249,8 @@ public class MainActivity extends FragmentActivity {
         Log.d(TAG, "recordingState = " + recordingState);
         readStart();
         tab.startRecord();
+        tab.setName(getString(R.string.new_tab_name));
+        infoText.setText(getString(R.string.new_tab_name));
 
     }
 
@@ -311,7 +313,7 @@ public class MainActivity extends FragmentActivity {
 
             while (isReading) {
 
-//                iview.setImageDrawable(texts);
+//                iview.setImageDrawable(canvasDrawing);
                 readCount = audioRecord.read(myBuffer, 0, myBufferSize);
                 for (int i = 0; i < myBuffer.length; i++) {
                     myBuffer[i] *= window.Gausse(i, myBufferSize);
@@ -340,13 +342,13 @@ public class MainActivity extends FragmentActivity {
 
                         final String finalFreq = String.valueOf(freq);
                         runOnUiThread(() -> textView.setText(finalFreq));
-//                        ((Texts)iview.getDrawable()).printFreq(String.valueOf(freq));
-//                        texts.setFreq(String.valueOf(freq));
+//                        ((CanvasDrawing)iview.getDrawable()).printFreq(String.valueOf(freq));
+//                        canvasDrawing.setFreq(String.valueOf(freq));
 //                        Log.i("freq",finalFreq);
                         determineNotes(freq);
                         tab.addNote(note);
                     }
-//                        texts.setNote(note);
+//                        canvasDrawing.setNote(note);
                 }
 
             }
@@ -385,7 +387,6 @@ public class MainActivity extends FragmentActivity {
     void initializeAFC() {
         for (int i = 0; i < 1100; i++) {
             setAmplitude(2, amplitudeLayoutTOP);
-            setAmplitude(2, amplitudeLayoutBOTTOM);
         }
     }
 
@@ -404,10 +405,8 @@ public class MainActivity extends FragmentActivity {
                 try {
                     if (amplitude > 0) {
                         amplitudeLayoutTOP.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, amplitude));
-                        amplitudeLayoutBOTTOM.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, 0));
                     } else {
                         amplitudeLayoutTOP.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, 0));
-                        amplitudeLayoutBOTTOM.getChildAt(index).setLayoutParams(new LinearLayout.LayoutParams(barSize, -amplitude));
                     }
                 } catch (Exception e) {
                     Log.e("INDEX", String.valueOf(index));
@@ -451,8 +450,8 @@ public class MainActivity extends FragmentActivity {
             note = "";
             return;
         }
-//        ((Texts) iview.getDrawable()).printNote(String.valueOf(s));
-//        texts.printNote(s);
+//        ((CanvasDrawing) iview.getDrawable()).printNote(String.valueOf(s));
+//        canvasDrawing.printNote(s);
         runOnUiThread(() -> noteText.setText(note));
 
     }

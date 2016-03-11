@@ -56,31 +56,49 @@ public class FilesControl {
         }
     }
 
-    public boolean saveTab(String tabName, Tablature tab) throws IOException {
-        File file = new File(PATH + tabName + TAB_EXTENSION);
-        if (!file.createNewFile()) {
-            return false;
-        } else {
-            PrintWriter writer = new PrintWriter(file);
+    private void printData(File file, Tablature tab) throws FileNotFoundException {
+        PrintWriter writer = new PrintWriter(file);
 
-            writer.println(tab.getBPM());
+        tab.prepareToSaving();
 
-            for (int i = 0; i < 6; i++) {
-                String storedData = "";
-                for (String s : tab.getStringsList().get(i)) {
-                    storedData = storedData.concat(s);
-                }
-                writer.println(storedData);
+        writer.println(tab.getBPM());
+
+        for (int i = 0; i < 6; i++) {
+            String storedData = "";
+            for (String s : tab.getStringsList().get(i)) {
+                storedData = storedData.concat(s);
             }
-            writer.close();
+            writer.println(storedData);
+        }
+        writer.close();
+    }
 
+    public boolean saveTab(String tabName, Tablature tab, boolean overwrite) throws IOException {
+        File file = new File(PATH + tabName + TAB_EXTENSION);
+        if (overwrite) {
+            boolean res = file.delete();
+            res |= file.createNewFile();
+            if (!res) {
+                throw new IOException("File overwriting error");
+            }
+            printData(file, tab);
+        } else {
+            if (!file.createNewFile()) {
+                if (file.exists()) {
+                    return false;
+                } else {
+                    throw new IOException("File creating error");
+                }
+            } else {
+                printData(file, tab);
+            }
         }
         return true;
     }
 
     public Tablature openTab(String name) throws Exception {
+        Tablature tab = new Tablature(context, name);
         name = name + TAB_EXTENSION;
-        Tablature tab = new Tablature(context);
         tab.clearTab();
         BufferedReader reader = openFile(name);
 
@@ -98,12 +116,12 @@ public class FilesControl {
             } else {
                 for (int string = 0; string < 6; string++) {
                     String s = String.valueOf(l.get(string).charAt(bar)) + String.valueOf(l.get(string).charAt(bar + 1));
-                    if (!s.equals("--")) {
+                    if (!s.equals("--") && !s.equals("-|")) {
                         try {
-                            tab.addNoteNoTime(string, Integer.valueOf(s));
+                            tab.addNoteNoTime(string + 1, Integer.valueOf(s));
                         } catch (NumberFormatException e) {
                             try {
-                                tab.addNoteNoTime(string, Integer.valueOf(String.valueOf(s.charAt(0))));
+                                tab.addNoteNoTime(string + 1, Integer.valueOf(String.valueOf(s.charAt(0))));
                             } catch (NumberFormatException ee) {
                                 e.printStackTrace();
                             }
@@ -130,7 +148,7 @@ public class FilesControl {
             }
         }
         savedTabChooser.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, fileslist));
-            return savedTabChooser;
+        return savedTabChooser;
     }
 
     public void saveFile(String name, ArrayList<Object> list) throws FileNotFoundException {

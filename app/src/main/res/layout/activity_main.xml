@@ -47,20 +47,20 @@
             android:id="@+id/freq_note_fragment"/>-->
         <TextView
             android:layout_weight="3"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:layout_gravity="center_horizontal|center_vertical"
-                    android:id="@+id/a110" />
-                <TextView
-                    android:layout_weight="3"
-                    android:textColor="#cc2424"
-                    android:textSize="20sp"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:id="@+id/note"
-                    android:layout_gravity="end"/>
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:id="@+id/a110"/>
+        <TextView
+            android:layout_weight="3"
+            android:textColor="#cc2424"
+            android:textSize="20sp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:id="@+id/note"
+            android:layout_gravity="end"/>
     </LinearLayout>
 
     <HorizontalScrollView android:id="@+id/amplitudeSCrollTOP"
@@ -77,20 +77,12 @@
         </LinearLayout>
     </HorizontalScrollView>
 
-    <HorizontalScrollView android:id="@+id/amplitudeSCrollBOTTOM"
-                          android:layout_width="match_parent"
-                          android:layout_height="match_parent"
-                          android:layout_weight="8"
-        >
-        <LinearLayout
-            android:id="@+id/amplitudeLayoutBOTTOM"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="top"
-            android:orientation="horizontal"
-            tools:ignore="ScrollViewSize">
-        </LinearLayout>
-    </HorizontalScrollView>
+    <TextView
+        android:id="@+id/info"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_weight="10"/>
+
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

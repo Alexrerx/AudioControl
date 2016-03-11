@@ -25,9 +25,9 @@
     <string name="temp">Установите темп</string>
     <string name="file">Выберите файл</string>
     <string name="settings">Настройки</string>
-    <string name="tab_name">Введите название таба</string>
+    <string name="input_tab_name">Введите название таба</string>
     <string name="save">Сохранить</string>
-    <string name="new_tab">Новый таб 1</string>
+    <string name="new_tab_name">Новый таб</string>
     <string name="freq_is_setted">Установлено значение</string>
 
 
@@ -35,4 +35,5 @@
     <string name="default_calibrate_text">Нажмите чтобы начать</string>
     <string name="stop">Стоп</string>
     <string name="start">Старт</string>
+    <string name="rewrite">Перезаписать файл?</string>
 </resources>
