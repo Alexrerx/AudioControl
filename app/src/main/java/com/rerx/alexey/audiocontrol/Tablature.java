@@ -279,14 +279,6 @@ public class Tablature {
         this.stringsList = stringsList;
     }
 
-    public void prepareToSaving() {
-        for (int i = 0; i < stringsList.size(); i++) {
-
-
-        }
-    }
-
-
     private class BarThread implements Runnable {
 
         @Override
@@ -332,9 +324,15 @@ public class Tablature {
 //                alternativeNoteColor = mainActivity.getResources()
 //                        .getColor(R.color.alternative_note),
                 emptyNoteColor = mainActivity.getResources()
-                        .getColor(R.color.empty_note);
+                .getColor(R.color.empty_note),
+                removingColor = mainActivity.getResources()
+                        .getColor(R.color.determined_note),
+                blackColor = mainActivity.getResources()
+                        .getColor(R.color.black);
         private String emptyNote = mainActivity.getString(R.string.empty_note);
         private int noteIndex = 0;
+        private String removeSymbol = "х";
+        private boolean removed = false;
 
         public Bar(Context context) {
             super(context);
@@ -371,6 +369,62 @@ public class Tablature {
             return note;
         }
 
+        private void setRemoveButton(int width) {
+            TextView txt = new TextView(context);
+            txt.setLayoutParams(new LinearLayout.LayoutParams(
+                    mainActivity.countSize(width),
+                    mainActivity.countSize(35),
+                    1));
+            txt.setTextSize(14);
+            txt.setGravity(TEXT_ALIGNMENT_CENTER);
+            txt.setText(removeSymbol);
+            txt.setTextAlignment(TEXT_ALIGNMENT_CENTER);
+            txt.setTag(this.getId(), "changing");
+
+            txt.setOnClickListener(v -> {
+
+                // TODO: 11.03.16 обработать случай нажатия при открытых альт нотках
+
+
+                if (v.getTag(this.getId()) == "changing") {
+                    removed = true;
+                    removeAlternativeNotes(0);
+                    txt.setTextColor(blackColor);
+                    removeNoteFromList(noteIndex);
+                    v.setTag(this.getId(), "");
+                } else {
+                    setAlternativeNotes(
+                            note.getAlternativeNotes(note.getString(), note.getFret()),
+                            note.getBasicNote().getString(),
+                            true);
+                    v.setTag(this.getId(), "changing");
+                    txt.setTextColor(removingColor);
+                }
+
+//                if(removed){
+//                    setAlternativeNotes(
+//                            note.getAlternativeNotes(note.getString(), note.getFret()),
+//                            note.getBasicNote().getString(),
+//                            true);
+//                    txt.setTextColor(removingColor);
+//
+//                }else{
+//                    removed = true;
+//                    removeAlternativeNotes(0);
+//                    removeNoteFromList(noteIndex);
+//                    txt.setTextColor(blackColor);
+//                }
+            });
+
+            this.addView(txt);
+        }
+
+        private void removeNoteFromList(int index) {
+            for (int i = 0; i < 6; i++) {
+                stringsList.get(i).set(index, emptyNote);
+            }
+        }
+
         private void setNoteToList(Note note, int index) {
             String fret = (note.getFret() < 10) ? String.valueOf(note.getFret()) + " " : String.valueOf(note.getFret());
 
@@ -397,41 +451,48 @@ public class Tablature {
             Log.d("Tab", note.toString());
             TextView textView = ((TextView) this.getChildAt(note.getString() - 1));
             textView.setText(String.valueOf(note.getFret()));
-            if (note.AlternativeNotesExist()) {
+//            if (note.AlternativeNotesExist()) {
 //                textView.setBackgroundColor(changingNoteColor);
-                textView.setBackgroundResource(R.mipmap.note_determ);
-                textView.setOnClickListener(v -> {
-                    if (v.getTag(this.getId()) == "changing") {
-                        removeAlternativeNotes(note.getString());
-//                        v.setBackgroundColor(emptyNoteColor);
-                        v.setBackgroundResource(R.mipmap.note);
-                        v.setTag(this.getId(), "");
-                    } else {
-                        setAlternativeNotes(note.getAlternativeNotes(note.getString(), note.getFret()), note.getBasicNote().getString());
-                        v.setTag(this.getId(), "changing");
-//                        v.setBackgroundColor(changingNoteColor);
-                        v.setBackgroundResource(R.mipmap.note_determ);
-                    }
-                });
-            }
+            textView.setBackgroundResource(R.mipmap.note_determ);
+
+            textView.setOnClickListener(v -> {
+                if (v.getTag(this.getId()) == "changing") {
+                    removed = false;
+                    removeAlternativeNotes(note.getString());
+                    v.setBackgroundResource(R.mipmap.note);
+                    v.setTag(this.getId(), "");
+                } else {
+                    setAlternativeNotes(
+                            note.getAlternativeNotes(note.getString(), note.getFret()),
+                            note.getBasicNote().getString(),
+                            false);
+                    v.setTag(this.getId(), "changing");
+                    v.setBackgroundResource(R.mipmap.note_determ);
+                }
+            });
+//        }
             return this;
         }
 
-        void setAlternativeNotes(HashMap<Integer, Integer> map, int startSting) {
+        void setAlternativeNotes(HashMap<Integer, Integer> map, int startSting, boolean includeCurrent) {
             for (int i = startSting; i < 7; i++) {
-                if (i != note.getString() && map.get(i) != null) {
+                if ((i != note.getString() || includeCurrent) && map.get(i) != null) {
                     TextView text = ((TextView) this.getChildAt(i - 1));
                     text.setText(String.valueOf(map.get(i)));
                     text.setTag(text.getId(), new Note(i, map.get(i)));
 //                    text.setBackgroundColor(alternativeNoteColor);
                     text.setBackgroundResource(R.mipmap.note_new);
                     text.setOnClickListener(v -> {
+                        removed = false;
                         this.removeAllViews();
                         ((Bar) this.setLayout(6, emptyNote, 30)).setNote((Note) v.getTag(v.getId()), this.noteIndex);
                         v.setBackgroundResource(R.mipmap.note);
 
                     });
                 }
+            }
+            if (!removed) {
+                setRemoveButton(30);
             }
         }
 
@@ -443,6 +504,13 @@ public class Tablature {
                 text.setBackgroundColor(emptyNoteColor);
                 text.setOnClickListener(null);
                 }
+            }
+            if (!removed) {
+//                    TextView text = ((TextView) this.getChildAt(6));
+//                    text.setText("");
+//                    text.setBackgroundColor(emptyNoteColor);
+//                    text.setOnClickListener(null);
+                this.removeViewAt(6);
             }
         }
 

@@ -29,6 +29,8 @@
     <string name="save">Сохранить</string>
     <string name="new_tab_name">Новый таб</string>
     <string name="freq_is_setted">Установлено значение</string>
+    <string name="error_calibration">Неверное значение частоты!\nУстановлено значение по-умолчанию
+    </string>
 
 
     <string name="calibrate">Определите частоту ноты ля первой октавы</string>

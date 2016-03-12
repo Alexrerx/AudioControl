@@ -317,7 +317,13 @@ public class UI {
                 })
                 .setPositiveButton(R.string.save, (dialog1, which1) -> {
                     calibration.stopReading();
-                    mainActivity.setBaseFreq(calibration.getMaxFreq());
+
+                    try {
+                        mainActivity.setBaseFreq(Integer.valueOf(freqEdit.getText().toString()));
+                    } catch (Exception e) {
+                        showToast(mainActivity.getString(R.string.error_calibration));
+                        mainActivity.setBaseFreq(441);
+                    }
                 })
                 .create();
     }

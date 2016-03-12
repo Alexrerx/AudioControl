@@ -59,7 +59,6 @@ public class FilesControl {
     private void printData(File file, Tablature tab) throws FileNotFoundException {
         PrintWriter writer = new PrintWriter(file);
 
-        tab.prepareToSaving();
 
         writer.println(tab.getBPM());
 
