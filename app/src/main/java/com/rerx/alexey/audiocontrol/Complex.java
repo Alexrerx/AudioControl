@@ -35,7 +35,6 @@ public class Complex {
      * tan(a)       = -6.685231390246571E-6 + 1.0000103108981198i
      ******************************************************************************/
 
-
     public double re;   // the real part
     public double im;   // the imaginary part
     public double abs = Math.sqrt(re * re + im * im);
