@@ -80,6 +80,7 @@ public class Tablature {
         initializeList();
         initializeTab();
         initializeVars();
+        notesIndex = 1;
 
     }
 
