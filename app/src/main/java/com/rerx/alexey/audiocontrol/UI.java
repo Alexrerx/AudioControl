@@ -367,10 +367,12 @@ public class UI {
 
     private void setTabEditingMode(boolean mode) {
         if (mode) {
+            mainActivity.audioBtn.setEnabled(true);
             mainActivity.startRecordBtn.setEnabled(false);
             mainActivity.stopRecordBtn.setEnabled(true);
             mainActivity.tab.setEditingMode(true);
         } else {
+            mainActivity.audioBtn.setEnabled(false);
             mainActivity.startRecordBtn.setEnabled(true);
             mainActivity.stopRecordBtn.setEnabled(false);
             mainActivity.tab.setEditingMode(false);

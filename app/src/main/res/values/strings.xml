@@ -19,7 +19,8 @@
     <string name="buffer_size">Размер буфера</string>
     <string name="error_tab_loading">Ошибка загрузки табулатуры!</string>
     <string name="menu">Меню</string>
-    <string name="exit_without_saving">Выйти\n без сохранения</string>
+    <!--<string name="exit_without_saving">Выйти\n без сохранения</string>-->
+    <string name="exit_without_saving">Не\n сохранять</string>
     <string name="continue_record">Продолжить</string>
     <string name="warning_not_saved">Несохраненные данные будут потеряны!</string>
     <string name="temp">Установите темп</string>

@@ -24,13 +24,13 @@ public class FilesControl {
     private Context context;
     private MainActivity mainActivity;
 
-    private static final String FILE_FOLDER = "AudioControl";
-    private static final String PATH = android.os.Environment
+    public static final String FILE_FOLDER = "AudioControl";
+    public static final String PATH = android.os.Environment
             .getExternalStorageDirectory()
             + java.io.File.separator
             + FILE_FOLDER + java.io.File.separator;
 
-    private String TAB_EXTENSION = ".tab";
+    public String TAB_EXTENSION = ".tab";
 
 
     FilesControl(Context context) {
@@ -72,7 +72,16 @@ public class FilesControl {
         writer.close();
     }
 
+    public void saveRecord(String recordName){
+        mainActivity.record.finish(PATH+recordName+Record.FILE_EXTENSION);
+        for (String file:mainActivity.record.getTmpFiles()){
+            new File(file).delete();
+        }
+
+    }
+
     public boolean saveTab(String tabName, Tablature tab, boolean overwrite) throws IOException {
+        saveRecord(tabName);
         File file = new File(PATH + tabName + TAB_EXTENSION);
         if (overwrite) {
             boolean res = file.delete();
