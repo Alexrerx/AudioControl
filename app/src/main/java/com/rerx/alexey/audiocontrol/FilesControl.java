@@ -73,10 +73,10 @@ public class FilesControl {
     }
 
     public void saveRecord(String recordName){
-        mainActivity.record.finish(PATH+recordName+Record.FILE_EXTENSION);
-        for (String file:mainActivity.record.getTmpFiles()){
-            new File(file).delete();
-        }
+//        mainActivity.record.finish(PATH+recordName+Record.FILE_EXTENSION);
+//        for (String file:mainActivity.record.getTmpFiles()){
+//            new File(file).delete();
+//        }
 
     }
 

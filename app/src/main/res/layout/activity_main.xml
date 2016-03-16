@@ -30,7 +30,7 @@
             android:onClick="onRecordStopClick"
             android:text="@string/stop_record">
         </Button>
-        <Button
+        <!--<Button
             android:textSize="12sp"
             android:id="@+id/button_audio_control"
             android:background="@android:drawable/ic_media_play"
@@ -40,7 +40,7 @@
             android:layout_weight="3"
             android:onClick="onAudioClick"
             >
-        </Button>
+        </Button>-->
 
         <!--     <ImageView
                  android:id="@+id/text_note"

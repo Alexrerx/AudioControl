@@ -32,10 +32,10 @@ public class Record {
     MainActivity mainActivity;
     Context context;
 
-    Record(Context context) {
-        this.context = context;
-        mainActivity = (MainActivity) context;
-    }
+//    Record(Context context) {
+//        this.context = context;
+//        mainActivity = (MainActivity) context;
+//    }
 
 
     @NonNull

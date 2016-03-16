@@ -26,7 +26,7 @@ public class MainActivity extends FragmentActivity {
     FFT fft;
 
     TextView textView, noteText, infoText;
-    Button startRecordBtn, stopRecordBtn,audioBtn;
+    Button startRecordBtn, stopRecordBtn/*,audioBtn*/;
 
     FFTAnother fftAnother;
     Complex complex;
@@ -34,8 +34,8 @@ public class MainActivity extends FragmentActivity {
     Tablature tab;
     FilesControl filesControl;
     UI ui;
-    Record record;
-
+//    Record record;
+//
     final String TAG = "myLogs";
     Window window;
     LinearLayout amplitudeLayoutTOP;
@@ -79,14 +79,14 @@ public class MainActivity extends FragmentActivity {
         filesControl = new FilesControl(context);
         canvasDrawing = new CanvasDrawing(context);
         ui = new UI(context);
-        record  = new Record(context);
+//        record  = new Record(context);
 
         amplitudeColor = getResources().getColor(R.color.amplitude);
         maxAmplitudeColor = getResources().getColor(R.color.maxAmplitude);
 
         startRecordBtn = (Button) findViewById(R.id.button_start_record);
         stopRecordBtn = (Button) findViewById(R.id.button_stop_record);
-        audioBtn = (Button) findViewById(R.id.button_audio_control);
+//        audioBtn = (Button) findViewById(R.id.button_audio_control);
 
         textView = (TextView) findViewById(R.id.a110);
         noteText = (TextView) findViewById(R.id.note);
@@ -246,8 +246,8 @@ public class MainActivity extends FragmentActivity {
 
     public void startRecord() {
         isPaused = false;
-        record.recordStart();
-        audioBtn.setEnabled(false);
+//        record.recordStart();
+//        audioBtn.setEnabled(false);
         stopRecordBtn.setEnabled(true);
         startRecordBtn.setText(getString(R.string.pause_record));
         Log.e(TAG, "record start");
@@ -274,10 +274,10 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void pauseRecord() {
-        audioBtn.setEnabled(true);
+//        audioBtn.setEnabled(true);
         isReading = false;
         isPaused = true;
-        record.recordPause();
+//        record.recordPause();
         startRecordBtn.setText(getString(R.string.continue_record));
         Log.i(TAG, "Record paused");
         audioRecord.stop();
@@ -474,13 +474,13 @@ public class MainActivity extends FragmentActivity {
 
     public void onAudioClick(View view) {
 
-        if(record.isPlaying){
-            record.playStop();
-            Log.d("playing","stop");
-        }else{
-            record.playStart();
-            Log.d("playing", "play");
-        }
+//        if(record.isPlaying){
+////            record.playStop();
+//            Log.d("playing","stop");
+//        }else{
+//            record.playStart();
+//            Log.d("playing", "play");
+//        }
 
 
 
