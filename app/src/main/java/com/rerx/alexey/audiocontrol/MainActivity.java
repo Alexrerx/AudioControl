@@ -257,7 +257,7 @@ public class MainActivity extends FragmentActivity {
         readStart();
         tab.startRecord();
         tab.setName(getString(R.string.new_tab_name));
-        infoText.setText(getString(R.string.new_tab_name));
+//        infoText.setText(getString(R.string.new_tab_name));
 
     }
 
