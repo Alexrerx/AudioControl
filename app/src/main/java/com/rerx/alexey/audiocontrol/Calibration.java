@@ -32,7 +32,7 @@ public class Calibration {
     Calibration(Context context) {
         this.context = context;
         mainActivity = (MainActivity) context;
-        myBufferSize = 4096;
+        myBufferSize = 1024;
         audioRecord = mainActivity.audioRecord;
         ShiftsPerFrame = mainActivity.ShiftsPerFrame;
         sampleRate = mainActivity.sampleRate;

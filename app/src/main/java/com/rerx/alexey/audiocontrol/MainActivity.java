@@ -116,12 +116,12 @@ public class MainActivity extends FragmentActivity {
     private String[] setNotes() {
         String[] s = new String[50];
         int count = 0;
-        for (int i =6 ; i > 0; i--) {
+        for (int i = 6; i > 0; i--) {
             if (i == 2) {
                 for (int j = 0; j < 4; j++) {
                     s[count++] = String.valueOf(i) + "-" + String.valueOf(j);
                 }
-            }else if (i == 1) {
+            } else if (i == 1) {
                 for (int j = 0; j < 21; j++) {
                     s[count++] = String.valueOf(i) + "-" + String.valueOf(j);
                 }
@@ -135,6 +135,8 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void initializeMap_new() {
+
+        notesMap.clear();
 
         int old = countFreq(-30);
         int old_v = 70;
@@ -318,6 +320,8 @@ public class MainActivity extends FragmentActivity {
 //            myBufferOld = myBuffer;
             this.spec0 = fftAnother.DecimationInTime(frame0, true, true);
 
+            long startTime = System.currentTimeMillis();
+
             while (isReading) {
 
 //                iview.setImageDrawable(canvasDrawing);
@@ -345,7 +349,9 @@ public class MainActivity extends FragmentActivity {
 
                 if (freq_tmp != freq) {
                     freq = freq_tmp;
-                    if ((freq > 60) && (freq < 1047)) {
+                    if ((freq > 60) && (freq < 1047) && ((System.currentTimeMillis()-startTime) > tab.getMinNoteTime())) {
+
+                        startTime = System.currentTimeMillis();
 
                         final String finalFreq = String.valueOf(freq);
                         runOnUiThread(() -> textView.setText(finalFreq));
@@ -374,7 +380,8 @@ public class MainActivity extends FragmentActivity {
     }
 
     public void setBaseFreq(int baseFreq) {
-        this.baseFreq = baseFreq;
+        this.baseFreq = 4 * baseFreq;
+        initializeMap_new();
         ui.showToast(getString(R.string.freq_is_setted) + " " + baseFreq);
     }
 
@@ -422,22 +429,24 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
-
-
+    double maxAmplitude = 0;
+    double minAmplatude = 10000.0;
 
 
     public double getMaxIndex(Object[] arr) {
         double fr = 0;
-        Integer spectrumMax = (Integer) arr[0];
+//        Integer spectrumMax = (Integer) arr[0];
+        Integer spectrumMax = 0;
         for (short i = 0; i < arr.length; i++) {
-            if ((Integer) arr[i] > spectrumMax) {
-                spectrumMax = (Integer) arr[i];
+            if ((Integer) arr[i] > spectrumMax && (Integer) arr[i] > minAmplatude) {
+                    spectrumMax = (Integer) arr[i];
                 fr = i;
             }
         }
+//        maxAmplitude = spectrumMax;
+//        Log.d("MAX", maxAmplitude + "");
         return fr;
     }
-
 
 
     @Override

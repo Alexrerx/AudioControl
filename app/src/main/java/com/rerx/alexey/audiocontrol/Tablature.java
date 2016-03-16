@@ -38,6 +38,7 @@ public class Tablature {
     private int notesIndex = 1;
     private String name;
     private boolean isEditing = false;
+    private double minNoteTime =0.0;
 
 
     private ArrayList<Note> temp = new ArrayList<>();
@@ -94,6 +95,14 @@ public class Tablature {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public double getMinNoteTime(){
+        return minNoteTime;
+    }
+
+    public void setMinNoteTime(double minNoteTime) {
+        this.minNoteTime = minNoteTime;
     }
 
     private void initializeVars() {
@@ -203,6 +212,7 @@ public class Tablature {
         this.bpm = bpm;
         barTime = (int) Math.round(60000000.0 / bpm);
         eps = barTime / 16;
+        setMinNoteTime((60000/bpm)/32);
     }
 
     private void addBeat(Note note) {
